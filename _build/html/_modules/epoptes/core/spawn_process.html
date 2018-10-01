@@ -1,0 +1,267 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>epoptes.core.spawn_process &#8212; Epoptes 2018 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for epoptes.core.spawn_process</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python3</span>
+<span class="c1"># This file is part of Epoptes, http://epoptes.org</span>
+<span class="c1"># Copyright 2018 the Epoptes team, see AUTHORS.</span>
+<span class="c1"># SPDX-License-Identifier: GPL-3.0-or-later</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Spawn a process asynchronously and get its output in a callback.</span>
+<span class="sd">https://twistedmatrix.com/documents/current/core/howto/process.html</span>
+<span class="sd">The spawned process may be terminated:</span>
+<span class="sd"> * By itself with exit code = 0 (success)</span>
+<span class="sd"> * By itself with exit code != 0 (failure)</span>
+<span class="sd"> * By SpawnProcess when lines_max is reached (success)</span>
+<span class="sd"> * By SpawnProcess when timeout is reached (failure)</span>
+<span class="sd"> * By the caller (e.g. a cancel button) using SpawnProcess.stop() (failure)</span>
+<span class="sd">It&#39;s possible that some useful stdout exists even on failure.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">twisted.internet</span> <span class="k">import</span> <span class="n">protocol</span><span class="p">,</span> <span class="n">reactor</span>
+
+<span class="kn">from</span> <span class="nn">epoptes.core</span> <span class="k">import</span> <span class="n">logger</span>
+
+
+<span class="n">LOG</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">Logger</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SpawnProcess"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.spawn_process.SpawnProcess">[docs]</a><span class="k">class</span> <span class="nc">SpawnProcess</span><span class="p">(</span><span class="n">protocol</span><span class="o">.</span><span class="n">ProcessProtocol</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Spawn a process asynchronously and get its output in a callback.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">on_exit</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dc_stop</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># IDelayedCall, to cancel the stop callback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dc_timeout</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># IDelayedCall, to cancel the timeout callback</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">err_data</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines_max</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_exit</span> <span class="o">=</span> <span class="n">on_exit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span> <span class="o">=</span> <span class="sa">b</span><span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;idle&#39;</span>  <span class="c1"># or: running, stopping1, stopping2, stopping3</span>
+
+    <span class="k">def</span> <span class="nf">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Kill child processes even on abrupt exits.&quot;&quot;&quot;</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="s2">&quot;__del__:&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;running&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="s1">&#39;destructor&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SpawnProcess.spawn"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.spawn_process.SpawnProcess.spawn">[docs]</a>    <span class="k">def</span> <span class="nf">spawn</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmdline</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">lines_max</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Spawn the process and run on_exit on exit, timeout, or lines_max.&quot;&quot;&quot;</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="s2">&quot;spawn: </span><span class="si">{}</span><span class="s2">, timeout: </span><span class="si">{}</span><span class="s2">, lines_max: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+            <span class="n">cmdline</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">lines_max</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;idle&quot;</span>
+        <span class="c1"># Reinitialize vars without duplicating a lot of code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_exit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines_max</span> <span class="o">=</span> <span class="n">lines_max</span>
+        <span class="k">if</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="c1"># noinspection PyUnresolvedReferences</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dc_timeout</span> <span class="o">=</span> <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="n">timeout</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="s2">&quot;timeout&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dc_timeout</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># noinspection PyUnresolvedReferences</span>
+        <span class="n">reactor</span><span class="o">.</span><span class="n">spawnProcess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmdline</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cmdline</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpawnProcess.stop"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.spawn_process.SpawnProcess.stop">[docs]</a>    <span class="k">def</span> <span class="nf">stop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Send TERM, TERM, KILL, with 0.5 sec delays.&quot;&quot;&quot;</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="s2">&quot;stop(&#39;</span><span class="si">{}</span><span class="s2">&#39;)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">reason</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="s2">&quot;idle&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">transport</span>
+        <span class="c1"># Once stopping started, only accept calls from stop itself,</span>
+        <span class="c1"># and not for example lines_max calls.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;stopping&quot;</span><span class="p">)</span> \
+                <span class="ow">and</span> <span class="ow">not</span> <span class="n">reason</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;stopping&quot;</span><span class="p">):</span>
+            <span class="k">return</span>
+        <span class="c1"># Only keep the initial reason</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">reason</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="n">reason</span>
+        <span class="c1"># Cancel the timeout callback</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dc_timeout</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reason</span> <span class="o">!=</span> <span class="s2">&quot;timeout&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dc_timeout</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dc_timeout</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;running&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s2">&quot;stopping1&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">signalProcess</span><span class="p">(</span><span class="s1">&#39;TERM&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;stopping1&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s2">&quot;stopping2&quot;</span>
+            <span class="c1"># iperf2 requests 2 TERM signals to abort waiting open connections</span>
+            <span class="c1"># Additionally, help it by closing its stdio</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">loseConnection</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">signalProcess</span><span class="p">(</span><span class="s1">&#39;TERM&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;stopping2&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s2">&quot;stopping3&quot;</span>
+            <span class="c1"># Kill it, don&#39;t wait any longer</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">signalProcess</span><span class="p">(</span><span class="s1">&#39;KILL&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;Unable to kill child process!&quot;</span>
+        <span class="c1"># noinspection PyUnresolvedReferences</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dc_stop</span> <span class="o">=</span> <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpawnProcess.connectionMade"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.spawn_process.SpawnProcess.connectionMade">[docs]</a>    <span class="k">def</span> <span class="nf">connectionMade</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override BaseProtocol.connectionMade.&quot;&quot;&quot;</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="s2">&quot;connectionMade: pid =&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">pid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s1">&#39;running&#39;</span></div>
+
+<div class="viewcode-block" id="SpawnProcess.errReceived"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.spawn_process.SpawnProcess.errReceived">[docs]</a>    <span class="k">def</span> <span class="nf">errReceived</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override ProcessProtocol.errReceived.&quot;&quot;&quot;</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="s2">&quot;errReceived:&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">err_data</span> <span class="o">+=</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="SpawnProcess.outReceived"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.spawn_process.SpawnProcess.outReceived">[docs]</a>    <span class="k">def</span> <span class="nf">outReceived</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override ProcessProtocol.outReceived.&quot;&quot;&quot;</span>
+        <span class="n">old_lines_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lines_count</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lines_count</span> <span class="o">+=</span> <span class="n">data</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="s2">&quot;outReceived, lines_count = </span><span class="si">%s</span><span class="s2">:&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">lines_count</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">out_data</span> <span class="o">+=</span> <span class="n">data</span>
+        <span class="c1"># If this is the first time lines_max is exceeded, call stop</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">lines_count</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lines_max</span> <span class="o">&gt;</span> <span class="n">old_lines_count</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="s2">&quot;lines_max&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpawnProcess.processExited"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.spawn_process.SpawnProcess.processExited">[docs]</a>    <span class="k">def</span> <span class="nf">processExited</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reason</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override ProcessProtocol.processExited.&quot;&quot;&quot;</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="s2">&quot;processExited:&quot;</span><span class="p">,</span> <span class="n">reason</span><span class="o">.</span><span class="n">value</span><span class="o">.</span><span class="n">exitCode</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s2">&quot;idle&quot;</span>
+        <span class="c1"># Cancel the timeout and stop callbacks</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dc_timeout</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dc_timeout</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dc_timeout</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dc_stop</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dc_stop</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dc_stop</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">reason</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reason</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">reason</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+        <span class="c1"># noinspection PyUnresolvedReferences</span>
+        <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">call_on_exit</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpawnProcess.call_on_exit"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.spawn_process.SpawnProcess.call_on_exit">[docs]</a>    <span class="k">def</span> <span class="nf">call_on_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Call on_exit after processing all twisted events.</span>
+<span class="sd">        When e.g. the iperf port is already in use, processExited happens</span>
+<span class="sd">        before errReceived gets &quot;bind failed: Address already in use&quot;.</span>
+<span class="sd">        Using callLater, on_exit is able to properly get and display stderr.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">on_exit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">err_data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reason</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.spawn_process.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Run a test from the command line.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">on_test_exit</span><span class="p">(</span><span class="n">out_data</span><span class="p">,</span> <span class="n">err_data</span><span class="p">,</span> <span class="n">reason</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Called by SpawnProcess when the test process exits.&quot;&quot;&quot;</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="s2">&quot;  Callback out_data:&quot;</span><span class="p">,</span> <span class="n">out_data</span><span class="p">)</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="s2">&quot;  Callback err_data:&quot;</span><span class="p">,</span> <span class="n">err_data</span><span class="p">)</span>
+        <span class="n">LOG</span><span class="o">.</span><span class="n">d</span><span class="p">(</span><span class="s2">&quot;  Callback reason:&quot;</span><span class="p">,</span> <span class="n">reason</span><span class="p">)</span>
+        <span class="c1"># Quit a bit later in order to test if events occur properly</span>
+        <span class="c1"># noinspection PyUnresolvedReferences</span>
+        <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">reactor</span><span class="o">.</span><span class="n">stop</span><span class="p">)</span>
+
+    <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;# Produce some output with delays</span>
+<span class="s2">i=0</span>
+<span class="s2">while [ $i -lt 5 ]; do</span>
+<span class="s2">    echo &quot;process stdout line #$i&quot;</span>
+<span class="s2">    echo &quot;process stderr line #$i&quot; &gt;&amp;2</span>
+<span class="s2">    sleep 1</span>
+<span class="s2">    i=$(($i+1))</span>
+<span class="s2">done</span>
+<span class="s2">&quot;&quot;&quot;</span>
+    <span class="n">tests</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;process-error&#39;</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Running tests:&quot;</span><span class="p">,</span> <span class="n">tests</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;normal-termination&#39;</span> <span class="ow">in</span> <span class="n">tests</span><span class="p">:</span>
+        <span class="n">SpawnProcess</span><span class="p">(</span><span class="n">on_test_exit</span><span class="p">)</span><span class="o">.</span><span class="n">spawn</span><span class="p">([</span><span class="s1">&#39;sh&#39;</span><span class="p">,</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="n">script</span><span class="p">])</span>
+    <span class="k">if</span> <span class="s1">&#39;lines_max&#39;</span> <span class="ow">in</span> <span class="n">tests</span><span class="p">:</span>
+        <span class="n">SpawnProcess</span><span class="p">(</span><span class="n">on_test_exit</span><span class="p">)</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span>
+            <span class="p">[</span><span class="s1">&#39;sh&#39;</span><span class="p">,</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;trap &quot;&quot; TERM</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">script</span><span class="p">],</span> <span class="n">lines_max</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;timeout&#39;</span> <span class="ow">in</span> <span class="n">tests</span><span class="p">:</span>
+        <span class="n">SpawnProcess</span><span class="p">(</span><span class="n">on_test_exit</span><span class="p">)</span><span class="o">.</span><span class="n">spawn</span><span class="p">([</span><span class="s1">&#39;sh&#39;</span><span class="p">,</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="n">script</span><span class="p">],</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;event-driven&#39;</span> <span class="ow">in</span> <span class="n">tests</span><span class="p">:</span>  <span class="c1"># e.g. a cancel button</span>
+        <span class="n">proc</span> <span class="o">=</span> <span class="n">SpawnProcess</span><span class="p">(</span><span class="n">on_test_exit</span><span class="p">)</span>
+        <span class="n">proc</span><span class="o">.</span><span class="n">spawn</span><span class="p">([</span><span class="s1">&#39;sh&#39;</span><span class="p">,</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="n">script</span><span class="p">])</span>
+        <span class="c1"># noinspection PyUnresolvedReferences</span>
+        <span class="n">reactor</span><span class="o">.</span><span class="n">callLater</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">proc</span><span class="o">.</span><span class="n">stop</span><span class="p">,</span> <span class="s1">&#39;cancelled&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;process-error&#39;</span> <span class="ow">in</span> <span class="n">tests</span><span class="p">:</span>
+        <span class="n">SpawnProcess</span><span class="p">(</span><span class="n">on_test_exit</span><span class="p">)</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span>
+            <span class="p">[</span><span class="s1">&#39;sh&#39;</span><span class="p">,</span> <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;echo Started &amp;&amp; sleep 1 &amp;&amp; invalid-command&#39;</span><span class="p">])</span>
+
+    <span class="c1"># noinspection PyUnresolvedReferences</span>
+    <span class="n">reactor</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Giouli Tsami.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.
+    </div>
+  </body>
+</html>

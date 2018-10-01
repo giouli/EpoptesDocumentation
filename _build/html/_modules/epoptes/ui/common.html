@@ -1,0 +1,136 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>epoptes.ui.common &#8212; Epoptes 2018 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for epoptes.ui.common</h1><div class="highlight"><pre>
+<span></span><span class="c1"># This file is part of Epoptes, http://epoptes.org</span>
+<span class="c1"># Copyright 2018 the Epoptes team, see AUTHORS.</span>
+<span class="c1"># SPDX-License-Identifier: GPL-3.0-or-later</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Define required gi package versions in a common place, and install gettext.</span>
+
+<span class="sd">Rationale:</span>
+<span class="sd">gi requires something like:</span>
+<span class="sd">    import gi</span>
+<span class="sd">    gi.require_version(&#39;Gtk&#39;, &#39;3.0&#39;)</span>
+<span class="sd">    from gi.repository import Gtk</span>
+<span class="sd">This conflicts with https://www.python.org/dev/peps/pep-0008/#imports</span>
+<span class="sd">and triggers pycodestyle&#39;s &quot;E402 module level import not at top of file&quot;.</span>
+<span class="sd">The following is a bit better:</span>
+<span class="sd">    import sys  # Import standard library modules</span>
+
+<span class="sd">    import twisted  # Import third party modules</span>
+
+<span class="sd">    from epoptes.ui.common import gettext as _  # Import local modules</span>
+<span class="sd">    from gi.repository import Gtk, Gdk</span>
+<span class="sd">That last line &quot;only&quot; triggers pylint&#39;s &quot;wrong-import-position&quot; once.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">errno</span>
+<span class="kn">import</span> <span class="nn">gettext</span>
+<span class="kn">import</span> <span class="nn">locale</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">import</span> <span class="nn">gi</span>
+
+<span class="n">gi</span><span class="o">.</span><span class="n">require_version</span><span class="p">(</span><span class="s1">&#39;Gtk&#39;</span><span class="p">,</span> <span class="s1">&#39;3.0&#39;</span><span class="p">)</span>
+<span class="n">gi</span><span class="o">.</span><span class="n">require_version</span><span class="p">(</span><span class="s1">&#39;Gdk&#39;</span><span class="p">,</span> <span class="s1">&#39;3.0&#39;</span><span class="p">)</span>
+<span class="n">gi</span><span class="o">.</span><span class="n">require_version</span><span class="p">(</span><span class="s1">&#39;Notify&#39;</span><span class="p">,</span> <span class="s1">&#39;0.7&#39;</span><span class="p">)</span>
+<span class="n">gettext</span><span class="o">.</span><span class="n">textdomain</span><span class="p">(</span><span class="s1">&#39;epoptes&#39;</span><span class="p">)</span>
+<span class="n">locale</span><span class="o">.</span><span class="n">textdomain</span><span class="p">(</span><span class="s1">&#39;epoptes&#39;</span><span class="p">)</span>
+<span class="n">gettext</span> <span class="o">=</span> <span class="n">gettext</span><span class="o">.</span><span class="n">gettext</span>
+
+
+<div class="viewcode-block" id="locate_resource"><a class="viewcode-back" href="../../../rst/epoptes.ui.html#epoptes.ui.common.locate_resource">[docs]</a><span class="k">def</span> <span class="nf">locate_resource</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">absolute</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Search for filename in some known paths.&quot;&quot;&quot;</span>
+    <span class="c1"># Use recursion for absolute instead of multiple ifs:</span>
+    <span class="k">if</span> <span class="n">absolute</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">locate_resource</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="kc">False</span><span class="p">))</span>
+    <span class="n">test</span> <span class="o">=</span> <span class="n">filename</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">test</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">test</span>
+    <span class="n">test</span> <span class="o">=</span> <span class="s2">&quot;/usr/share/epoptes/&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">test</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">test</span>
+    <span class="n">test</span> <span class="o">=</span> <span class="s2">&quot;/usr/share/epoptes/images/&quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">test</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">test</span>
+    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+        <span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">strerror</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">ENOENT</span><span class="p">),</span> <span class="n">filename</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Giouli Tsami.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.
+    </div>
+  </body>
+</html>

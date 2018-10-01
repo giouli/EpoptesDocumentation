@@ -1,0 +1,166 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>epoptes.ui.client_information &#8212; Epoptes 2018 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for epoptes.ui.client_information</h1><div class="highlight"><pre>
+<span></span><span class="c1"># This file is part of Epoptes, http://epoptes.org</span>
+<span class="c1"># Copyright 2010-2018 the Epoptes team, see AUTHORS.</span>
+<span class="c1"># SPDX-License-Identifier: GPL-3.0-or-later</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Client information dialog.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">epoptes.common.constants</span> <span class="k">import</span> <span class="n">C_INSTANCE</span><span class="p">,</span> <span class="n">C_SESSION_HANDLE</span>
+<span class="kn">from</span> <span class="nn">epoptes.ui.common</span> <span class="k">import</span> <span class="n">gettext</span> <span class="k">as</span> <span class="n">_</span><span class="p">,</span> <span class="n">locate_resource</span>
+<span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">Gtk</span>
+
+
+<div class="viewcode-block" id="ClientInformation"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.client_information.ClientInformation">[docs]</a><span class="k">class</span> <span class="nc">ClientInformation</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Load the dialog and settings into local variables.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="n">builder</span> <span class="o">=</span> <span class="n">Gtk</span><span class="o">.</span><span class="n">Builder</span><span class="p">()</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">add_from_file</span><span class="p">(</span><span class="n">locate_resource</span><span class="p">(</span><span class="s1">&#39;client_information.ui&#39;</span><span class="p">))</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">connect_signals</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dialog</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;dlg_client_information&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dialog</span><span class="o">.</span><span class="n">set_transient_for</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_edit_alias</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;btn_edit_alias&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_edit_alias</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;dlg_edit_alias&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ent_alias</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;ent_alias&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_type</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_type&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_alias</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_alias&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_hostname</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_hostname&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_mac</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_mac&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_ip</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_ip&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_user</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_user&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_cpu</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_cpu&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_ram</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_ram&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_vga</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_vga&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="ClientInformation.run"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.client_information.ClientInformation.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">execute</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Show the dialog, then hide it so that it may be reused.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">client</span> <span class="o">=</span> <span class="n">client</span>
+
+        <span class="n">inst</span> <span class="o">=</span> <span class="n">client</span><span class="p">[</span><span class="n">C_INSTANCE</span><span class="p">]</span>
+        <span class="n">handle</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">hsystem</span> <span class="ow">or</span> <span class="n">client</span><span class="p">[</span><span class="n">C_SESSION_HANDLE</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_type</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_alias</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">alias</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_hostname</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">hostname</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_mac</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">mac</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_ip</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">handle</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">client</span><span class="p">[</span><span class="n">C_SESSION_HANDLE</span><span class="p">]:</span>
+            <span class="n">uname</span><span class="p">,</span> <span class="n">realname</span> <span class="o">=</span> <span class="n">inst</span><span class="o">.</span><span class="n">users</span><span class="p">[</span><span class="n">client</span><span class="p">[</span><span class="n">C_SESSION_HANDLE</span><span class="p">]]</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">realname</span><span class="p">:</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> (</span><span class="si">{}</span><span class="s1">)&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">uname</span><span class="p">,</span> <span class="n">realname</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="n">uname</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">user</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_user</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">user</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_cpu</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_ram</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_vga</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">handle</span><span class="p">:</span>
+            <span class="n">execute</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s1">&#39;echo &quot;$CPU&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cb_set_text</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lbl_cpu</span><span class="p">)</span>
+            <span class="n">execute</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s1">&#39;echo &quot;$RAM MiB&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cb_set_text</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lbl_ram</span><span class="p">)</span>
+            <span class="n">execute</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s1">&#39;echo &quot;$VGA&quot;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">addCallback</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cb_set_text</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lbl_vga</span><span class="p">)</span>
+        <span class="c1"># TODO: consider new string formatting vs updating translations</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dialog</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;Properties of </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="n">inst</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dialog</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dialog</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="ClientInformation.cb_set_text"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.client_information.ClientInformation.cb_set_text">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">cb_set_text</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">widget</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set a widget text to the result of a twisted call.&quot;&quot;&quot;</span>
+        <span class="n">widget</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="ClientInformation.on_edit_alias_clicked"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.client_information.ClientInformation.on_edit_alias_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">on_edit_alias_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_widget</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Show a dialog to edit the alias.&quot;&quot;&quot;</span>
+        <span class="n">inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">client</span><span class="p">[</span><span class="n">C_INSTANCE</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ent_alias</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">alias</span><span class="p">)</span>
+        <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dlg_edit_alias</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">reply</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">inst</span><span class="o">.</span><span class="n">set_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ent_alias</span><span class="o">.</span><span class="n">get_text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lbl_alias</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">alias</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_edit_alias</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Giouli Tsami.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.
+    </div>
+  </body>
+</html>

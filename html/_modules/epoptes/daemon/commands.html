@@ -1,0 +1,124 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>epoptes.daemon.commands &#8212; Epoptes 2018 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for epoptes.daemon.commands</h1><div class="highlight"><pre>
+<span></span><span class="c1"># This file is part of Epoptes, http://epoptes.org</span>
+<span class="c1"># Copyright 2010-2018 the Epoptes team, see AUTHORS.</span>
+<span class="c1"># SPDX-License-Identifier: GPL-3.0-or-later</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Commands used for guiplex.py &lt;=&gt; uiconnection.py AMP-based communication.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">twisted.protocols</span> <span class="k">import</span> <span class="n">amp</span>
+
+
+<div class="viewcode-block" id="ClientConnected"><a class="viewcode-back" href="../../../epoptes.daemon.html#epoptes.daemon.commands.ClientConnected">[docs]</a><span class="k">class</span> <span class="nc">ClientConnected</span><span class="p">(</span><span class="n">amp</span><span class="o">.</span><span class="n">Command</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Command for guiplex.py-&gt;GUI.client_connected</span>
+<span class="sd">     to remotely call uiconnection.py-&gt;Daemon.client_connected.</span>
+<span class="sd">     &quot;&quot;&quot;</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="p">[(</span><span class="sa">b</span><span class="s1">&#39;handle&#39;</span><span class="p">,</span> <span class="n">amp</span><span class="o">.</span><span class="n">Unicode</span><span class="p">())]</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="ClientDisconnected"><a class="viewcode-back" href="../../../epoptes.daemon.html#epoptes.daemon.commands.ClientDisconnected">[docs]</a><span class="k">class</span> <span class="nc">ClientDisconnected</span><span class="p">(</span><span class="n">amp</span><span class="o">.</span><span class="n">Command</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Command for guiplex.py-&gt;GUI.client_disconnected</span>
+<span class="sd">     to remotely call uiconnection.py-&gt;Daemon.client_disconnected.</span>
+<span class="sd">     &quot;&quot;&quot;</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="p">[(</span><span class="sa">b</span><span class="s1">&#39;handle&#39;</span><span class="p">,</span> <span class="n">amp</span><span class="o">.</span><span class="n">Unicode</span><span class="p">())]</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="EnumerateClients"><a class="viewcode-back" href="../../../epoptes.daemon.html#epoptes.daemon.commands.EnumerateClients">[docs]</a><span class="k">class</span> <span class="nc">EnumerateClients</span><span class="p">(</span><span class="n">amp</span><span class="o">.</span><span class="n">Command</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Command for uiconnection.py-&gt;Daemon.enumerate_clients</span>
+<span class="sd">     to remotely call guiplex.py-&gt;GUI.enumerate_clients.</span>
+<span class="sd">     &quot;&quot;&quot;</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="p">[(</span><span class="sa">b</span><span class="s1">&#39;handles&#39;</span><span class="p">,</span> <span class="n">amp</span><span class="o">.</span><span class="n">ListOf</span><span class="p">(</span><span class="n">amp</span><span class="o">.</span><span class="n">Unicode</span><span class="p">()))]</span></div>
+
+
+<div class="viewcode-block" id="ClientCommand"><a class="viewcode-back" href="../../../epoptes.daemon.html#epoptes.daemon.commands.ClientCommand">[docs]</a><span class="k">class</span> <span class="nc">ClientCommand</span><span class="p">(</span><span class="n">amp</span><span class="o">.</span><span class="n">Command</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Command for uiconnection.py-&gt;Daemon.command</span>
+<span class="sd">     to remotely call guiplex.py-&gt;GUI.command.</span>
+<span class="sd">     &quot;&quot;&quot;</span>
+    <span class="n">arguments</span> <span class="o">=</span> <span class="p">[(</span><span class="sa">b</span><span class="s1">&#39;handle&#39;</span><span class="p">,</span> <span class="n">amp</span><span class="o">.</span><span class="n">Unicode</span><span class="p">()),</span>
+                 <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;command&#39;</span><span class="p">,</span> <span class="n">amp</span><span class="o">.</span><span class="n">Unicode</span><span class="p">())]</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="p">[(</span><span class="sa">b</span><span class="s1">&#39;result&#39;</span><span class="p">,</span> <span class="n">amp</span><span class="o">.</span><span class="n">String</span><span class="p">()),</span>
+                <span class="p">(</span><span class="sa">b</span><span class="s1">&#39;filename&#39;</span><span class="p">,</span> <span class="n">amp</span><span class="o">.</span><span class="n">Unicode</span><span class="p">())]</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Giouli Tsami.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.
+    </div>
+  </body>
+</html>

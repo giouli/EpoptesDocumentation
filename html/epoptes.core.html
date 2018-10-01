@@ -1,0 +1,337 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>epoptes.core package &#8212; Epoptes 2018 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="epoptes.daemon package" href="epoptes.daemon.html" />
+    <link rel="prev" title="epoptes.common package" href="epoptes.common.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="epoptes.daemon.html" title="epoptes.daemon package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="epoptes.common.html" title="epoptes.common package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="epoptes.html" accesskey="U">epoptes package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="epoptes-core-package">
+<h1>epoptes.core package<a class="headerlink" href="#epoptes-core-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-epoptes.core.logger">
+<span id="epoptes-core-logger-module"></span><h2>epoptes.core.logger module<a class="headerlink" href="#module-epoptes.core.logger" title="Permalink to this headline">¶</a></h2>
+<p>Similar to logging.Logger, but simpler.</p>
+<dl class="class">
+<dt id="epoptes.core.logger.Logger">
+<em class="property">class </em><code class="descclassname">epoptes.core.logger.</code><code class="descname">Logger</code><span class="sig-paren">(</span><em>name=None</em>, <em>file=&lt;_io.TextIOWrapper name='&lt;stderr&gt;' mode='w' encoding='UTF-8'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/logger.html#Logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.logger.Logger" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Similar to logging.Logger, but simpler.</p>
+<dl class="method">
+<dt id="epoptes.core.logger.Logger.null">
+<code class="descname">null</code><span class="sig-paren">(</span><em>*_args</em>, <em>end='\n'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/logger.html#Logger.null"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.logger.Logger.null" title="Permalink to this definition">¶</a></dt>
+<dd><p>The self.[cdeiw] variables point here when debugging is disabled.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.logger.Logger.stderr">
+<code class="descname">stderr</code><span class="sig-paren">(</span><em>*args</em>, <em>end='\n'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/logger.html#Logger.stderr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.logger.Logger.stderr" title="Permalink to this definition">¶</a></dt>
+<dd><p>The self.[cdeiw] variables point here when debugging is enabled.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-epoptes.core.spawn_process">
+<span id="epoptes-core-spawn-process-module"></span><h2>epoptes.core.spawn_process module<a class="headerlink" href="#module-epoptes.core.spawn_process" title="Permalink to this headline">¶</a></h2>
+<p>Spawn a process asynchronously and get its output in a callback.
+<a class="reference external" href="https://twistedmatrix.com/documents/current/core/howto/process.html">https://twistedmatrix.com/documents/current/core/howto/process.html</a>
+The spawned process may be terminated:</p>
+<blockquote>
+<div><ul class="simple">
+<li>By itself with exit code = 0 (success)</li>
+<li>By itself with exit code != 0 (failure)</li>
+<li>By SpawnProcess when lines_max is reached (success)</li>
+<li>By SpawnProcess when timeout is reached (failure)</li>
+<li>By the caller (e.g. a cancel button) using SpawnProcess.stop() (failure)</li>
+</ul>
+</div></blockquote>
+<p>It’s possible that some useful stdout exists even on failure.</p>
+<dl class="class">
+<dt id="epoptes.core.spawn_process.SpawnProcess">
+<em class="property">class </em><code class="descclassname">epoptes.core.spawn_process.</code><code class="descname">SpawnProcess</code><span class="sig-paren">(</span><em>on_exit</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/spawn_process.html#SpawnProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.spawn_process.SpawnProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.internet.protocol.ProcessProtocol</span></code></p>
+<p>Spawn a process asynchronously and get its output in a callback.</p>
+<dl class="method">
+<dt id="epoptes.core.spawn_process.SpawnProcess.call_on_exit">
+<code class="descname">call_on_exit</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/spawn_process.html#SpawnProcess.call_on_exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.spawn_process.SpawnProcess.call_on_exit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Call on_exit after processing all twisted events.
+When e.g. the iperf port is already in use, processExited happens
+before errReceived gets “bind failed: Address already in use”.
+Using callLater, on_exit is able to properly get and display stderr.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.spawn_process.SpawnProcess.connectionMade">
+<code class="descname">connectionMade</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/spawn_process.html#SpawnProcess.connectionMade"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.spawn_process.SpawnProcess.connectionMade" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override BaseProtocol.connectionMade.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.spawn_process.SpawnProcess.errReceived">
+<code class="descname">errReceived</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/spawn_process.html#SpawnProcess.errReceived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.spawn_process.SpawnProcess.errReceived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override ProcessProtocol.errReceived.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.spawn_process.SpawnProcess.outReceived">
+<code class="descname">outReceived</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/spawn_process.html#SpawnProcess.outReceived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.spawn_process.SpawnProcess.outReceived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override ProcessProtocol.outReceived.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.spawn_process.SpawnProcess.processExited">
+<code class="descname">processExited</code><span class="sig-paren">(</span><em>reason</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/spawn_process.html#SpawnProcess.processExited"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.spawn_process.SpawnProcess.processExited" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override ProcessProtocol.processExited.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.spawn_process.SpawnProcess.spawn">
+<code class="descname">spawn</code><span class="sig-paren">(</span><em>cmdline</em>, <em>timeout=0</em>, <em>lines_max=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/spawn_process.html#SpawnProcess.spawn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.spawn_process.SpawnProcess.spawn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spawn the process and run on_exit on exit, timeout, or lines_max.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.spawn_process.SpawnProcess.stop">
+<code class="descname">stop</code><span class="sig-paren">(</span><em>reason=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/spawn_process.html#SpawnProcess.stop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.spawn_process.SpawnProcess.stop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send TERM, TERM, KILL, with 0.5 sec delays.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="epoptes.core.spawn_process.main">
+<code class="descclassname">epoptes.core.spawn_process.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/spawn_process.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.spawn_process.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a test from the command line.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-epoptes.core.structs">
+<span id="epoptes-core-structs-module"></span><h2>epoptes.core.structs module<a class="headerlink" href="#module-epoptes.core.structs" title="Permalink to this headline">¶</a></h2>
+<p>Classes for creating client and group objects.</p>
+<dl class="class">
+<dt id="epoptes.core.structs.Client">
+<em class="property">class </em><code class="descclassname">epoptes.core.structs.</code><code class="descname">Client</code><span class="sig-paren">(</span><em>type_=''</em>, <em>mac=''</em>, <em>hostname=''</em>, <em>alias=''</em>, <em>users=None</em>, <em>hsystem=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/structs.html#Client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.structs.Client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>An epoptes client.</p>
+<dl class="method">
+<dt id="epoptes.core.structs.Client.add_user">
+<code class="descname">add_user</code><span class="sig-paren">(</span><em>username</em>, <em>realname</em>, <em>handle</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/structs.html#Client.add_user"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.structs.Client.add_user" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a user in the users dict.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.structs.Client.get_name">
+<code class="descname">get_name</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/structs.html#Client.get_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.structs.Client.get_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the alias of the client or the hostname if the alias is not
+set, or if both are unset (offline clients) return the MAC address.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.structs.Client.is_offline">
+<code class="descname">is_offline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/structs.html#Client.is_offline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.structs.Client.is_offline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return True only if there is no system or session handle for this
+client but there is a MAC address.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.structs.Client.set_name">
+<code class="descname">set_name</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/structs.html#Client.set_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.structs.Client.set_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the client alias.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.structs.Client.set_offline">
+<code class="descname">set_offline</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/structs.html#Client.set_offline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.structs.Client.set_offline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Indicate that a client is now offline.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="epoptes.core.structs.Group">
+<em class="property">class </em><code class="descclassname">epoptes.core.structs.</code><code class="descname">Group</code><span class="sig-paren">(</span><em>name</em>, <em>members</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/structs.html#Group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.structs.Group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A group of epoptes clients.</p>
+<dl class="method">
+<dt id="epoptes.core.structs.Group.add_client">
+<code class="descname">add_client</code><span class="sig-paren">(</span><em>client</em>, <em>**props</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/structs.html#Group.add_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.structs.Group.add_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a client to the group.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.structs.Group.get_members">
+<code class="descname">get_members</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/structs.html#Group.get_members"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.structs.Group.get_members" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list with all the clients that are members of the group.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.structs.Group.get_property">
+<code class="descname">get_property</code><span class="sig-paren">(</span><em>client</em>, <em>prop</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/structs.html#Group.get_property"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.structs.Group.get_property" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the value of the ‘prop’ property for client.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.structs.Group.has_client">
+<code class="descname">has_client</code><span class="sig-paren">(</span><em>client</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/structs.html#Group.has_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.structs.Group.has_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if a client is member of the group.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.structs.Group.remove_client">
+<code class="descname">remove_client</code><span class="sig-paren">(</span><em>client</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/structs.html#Group.remove_client"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.structs.Group.remove_client" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a client from the group.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.core.structs.Group.set_properties">
+<code class="descname">set_properties</code><span class="sig-paren">(</span><em>client</em>, <em>**props</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/structs.html#Group.set_properties"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.structs.Group.set_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set x_pos, y_pos or size property for a client on the group.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-epoptes.core.wol">
+<span id="epoptes-core-wol-module"></span><h2>epoptes.core.wol module<a class="headerlink" href="#module-epoptes.core.wol" title="Permalink to this headline">¶</a></h2>
+<p>Power on remote computers using Wake On LAN.</p>
+<dl class="function">
+<dt id="epoptes.core.wol.get_broadcast_list">
+<code class="descclassname">epoptes.core.wol.</code><code class="descname">get_broadcast_list</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/wol.html#get_broadcast_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.wol.get_broadcast_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return all broadcast addresses.
+E.g. WOL messages need to be sent from all NICs.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="epoptes.core.wol.main">
+<code class="descclassname">epoptes.core.wol.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/wol.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.wol.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the module from the command line.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="epoptes.core.wol.wake_on_lan">
+<code class="descclassname">epoptes.core.wol.</code><code class="descname">wake_on_lan</code><span class="sig-paren">(</span><em>macaddress</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/core/wol.html#wake_on_lan"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.core.wol.wake_on_lan" title="Permalink to this definition">¶</a></dt>
+<dd><p>Power on remote computers using Wake On LAN.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-epoptes.core">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-epoptes.core" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">epoptes.core package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-epoptes.core.logger">epoptes.core.logger module</a></li>
+<li><a class="reference internal" href="#module-epoptes.core.spawn_process">epoptes.core.spawn_process module</a></li>
+<li><a class="reference internal" href="#module-epoptes.core.structs">epoptes.core.structs module</a></li>
+<li><a class="reference internal" href="#module-epoptes.core.wol">epoptes.core.wol module</a></li>
+<li><a class="reference internal" href="#module-epoptes.core">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="epoptes.common.html"
+                        title="previous chapter">epoptes.common package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="epoptes.daemon.html"
+                        title="next chapter">epoptes.daemon package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/epoptes.core.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="epoptes.daemon.html" title="epoptes.daemon package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="epoptes.common.html" title="epoptes.common package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="epoptes.html" >epoptes package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Giouli Tsami.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,501 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>epoptes.daemon package &#8212; Epoptes 2018 documentation</title>
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="epoptes.ui package" href="epoptes.ui.html" />
+    <link rel="prev" title="epoptes.core package" href="epoptes.core.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="epoptes.ui.html" title="epoptes.ui package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="epoptes.core.html" title="epoptes.core package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" ><strong>Epoptes</strong></a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="epoptes.html" accesskey="U"><strong>epoptes package</strong></a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="epoptes-daemon-package">
+<h1><strong>epoptes.daemon package</strong><a class="headerlink" href="#epoptes-daemon-package" title="Permalink to this headline">¶</a></h1>
+<img alt="../_images/banner.png" src="../_images/banner.png" />
+<div class="section" id="submodules">
+<h2><em>Submodules</em><a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-epoptes.daemon.bashplex">
+<span id="epoptes-daemon-bashplex-module"></span><h2><em>epoptes.daemon.bashplex module</em><a class="headerlink" href="#module-epoptes.daemon.bashplex" title="Permalink to this headline">¶</a></h2>
+<p>Protocol for epoptesd.py &lt;=&gt; epoptes-client communication.</p>
+<dl class="class">
+<dt id="epoptes.daemon.bashplex.DelimitedBashReceiver">
+<em class="property">class </em><code class="descclassname">epoptes.daemon.bashplex.</code><code class="descname">DelimitedBashReceiver</code><a class="reference internal" href="../_modules/epoptes/daemon/bashplex.html#DelimitedBashReceiver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.bashplex.DelimitedBashReceiver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.internet.protocol.Protocol</span></code></p>
+<p>Send bash commands followed by ”
+echo &lt;delimiter&gt;”.</p>
+<blockquote>
+<div>Buffer responses until the given delimiter is found.</div></blockquote>
+<dl class="method">
+<dt id="epoptes.daemon.bashplex.DelimitedBashReceiver.check_for_further_responses">
+<code class="descname">check_for_further_responses</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/bashplex.html#DelimitedBashReceiver.check_for_further_responses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.bashplex.DelimitedBashReceiver.check_for_further_responses" title="Permalink to this definition">¶</a></dt>
+<dd><p>See if there are more responses in the buffer.
+The theory here is that if we got one already, we have less than one
+packet of data left in the buffer, so reading it all isn’t a big deal.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.bashplex.DelimitedBashReceiver.command">
+<code class="descname">command</code><span class="sig-paren">(</span><em>cmd</em>, <em>delimiter=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/bashplex.html#DelimitedBashReceiver.command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.bashplex.DelimitedBashReceiver.command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Send a command and return its associated Deferred.
+We don’t do any state-checking here.
+If another command is in progress, it’ll probably be okay,
+but if serialization is required, it should be done elsewhere.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.bashplex.DelimitedBashReceiver.connectionLost">
+<code class="descname">connectionLost</code><span class="sig-paren">(</span><em>reason=&lt;twisted.python.failure.Failure twisted.internet.error.ConnectionDone: Connection was closed cleanly.&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/bashplex.html#DelimitedBashReceiver.connectionLost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.bashplex.DelimitedBashReceiver.connectionLost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override Protocol.connectionLost.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.bashplex.DelimitedBashReceiver.connectionMade">
+<code class="descname">connectionMade</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/bashplex.html#DelimitedBashReceiver.connectionMade"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.bashplex.DelimitedBashReceiver.connectionMade" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override BaseProtocol.connectionMade.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.bashplex.DelimitedBashReceiver.dataReceived">
+<code class="descname">dataReceived</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/bashplex.html#DelimitedBashReceiver.dataReceived"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.bashplex.DelimitedBashReceiver.dataReceived" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override Protocol.dataReceived.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.bashplex.DelimitedBashReceiver.ping">
+<code class="descname">ping</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/bashplex.html#DelimitedBashReceiver.ping"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.bashplex.DelimitedBashReceiver.ping" title="Permalink to this definition">¶</a></dt>
+<dd><p>Periodically ping the clients.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.bashplex.DelimitedBashReceiver.ping_response">
+<code class="descname">ping_response</code><span class="sig-paren">(</span><em>_</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/bashplex.html#DelimitedBashReceiver.ping_response"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.bashplex.DelimitedBashReceiver.ping_response" title="Permalink to this definition">¶</a></dt>
+<dd><p>Receive the responses from the client pings.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.bashplex.DelimitedBashReceiver.ping_timed_out">
+<code class="descname">ping_timed_out</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/bashplex.html#DelimitedBashReceiver.ping_timed_out"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.bashplex.DelimitedBashReceiver.ping_timed_out" title="Permalink to this definition">¶</a></dt>
+<dd><p>A response was not received for a ping within ping_timeout secs.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="epoptes.daemon.bashplex.DelimitedBashReceiverFactory">
+<em class="property">class </em><code class="descclassname">epoptes.daemon.bashplex.</code><code class="descname">DelimitedBashReceiverFactory</code><a class="reference internal" href="../_modules/epoptes/daemon/bashplex.html#DelimitedBashReceiverFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.bashplex.DelimitedBashReceiverFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.internet.protocol.ServerFactory</span></code></p>
+<p>Configuration variables for DelimitedBashReceiver.</p>
+<dl class="attribute">
+<dt id="epoptes.daemon.bashplex.DelimitedBashReceiverFactory.ping_interval">
+<code class="descname">ping_interval</code><em class="property"> = 10</em><a class="headerlink" href="#epoptes.daemon.bashplex.DelimitedBashReceiverFactory.ping_interval" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.bashplex.DelimitedBashReceiverFactory.ping_timeout">
+<code class="descname">ping_timeout</code><em class="property"> = 10</em><a class="headerlink" href="#epoptes.daemon.bashplex.DelimitedBashReceiverFactory.ping_timeout" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.bashplex.DelimitedBashReceiverFactory.protocol">
+<code class="descname">protocol</code><a class="headerlink" href="#epoptes.daemon.bashplex.DelimitedBashReceiverFactory.protocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#epoptes.daemon.bashplex.DelimitedBashReceiver" title="epoptes.daemon.bashplex.DelimitedBashReceiver"><code class="xref py py-class docutils literal notranslate"><span class="pre">DelimitedBashReceiver</span></code></a></p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.bashplex.DelimitedBashReceiverFactory.startup_commands">
+<code class="descname">startup_commands</code><em class="property"> = ''</em><a class="headerlink" href="#epoptes.daemon.bashplex.DelimitedBashReceiverFactory.startup_commands" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-epoptes.daemon.commands">
+<span id="epoptes-daemon-commands-module"></span><h2><em>epoptes.daemon.commands module</em><a class="headerlink" href="#module-epoptes.daemon.commands" title="Permalink to this headline">¶</a></h2>
+<p>Commands used for guiplex.py &lt;=&gt; uiconnection.py AMP-based communication.</p>
+<dl class="class">
+<dt id="epoptes.daemon.commands.ClientCommand">
+<em class="property">class </em><code class="descclassname">epoptes.daemon.commands.</code><code class="descname">ClientCommand</code><span class="sig-paren">(</span><em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/commands.html#ClientCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.commands.ClientCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.protocols.amp.Command</span></code></p>
+<p>Command for uiconnection.py-&gt;Daemon.command
+to remotely call guiplex.py-&gt;GUI.command.</p>
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.ClientCommand.allErrors">
+<code class="descname">allErrors</code><em class="property"> = {}</em><a class="headerlink" href="#epoptes.daemon.commands.ClientCommand.allErrors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.ClientCommand.arguments">
+<code class="descname">arguments</code><em class="property"> = [(b'handle', &lt;twisted.protocols.amp.Unicode object&gt;), (b'command', &lt;twisted.protocols.amp.Unicode object&gt;)]</em><a class="headerlink" href="#epoptes.daemon.commands.ClientCommand.arguments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.ClientCommand.commandName">
+<code class="descname">commandName</code><em class="property"> = b'ClientCommand'</em><a class="headerlink" href="#epoptes.daemon.commands.ClientCommand.commandName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.ClientCommand.response">
+<code class="descname">response</code><em class="property"> = [(b'result', &lt;twisted.protocols.amp.String object&gt;), (b'filename', &lt;twisted.protocols.amp.Unicode object&gt;)]</em><a class="headerlink" href="#epoptes.daemon.commands.ClientCommand.response" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.ClientCommand.reverseErrors">
+<code class="descname">reverseErrors</code><em class="property"> = {}</em><a class="headerlink" href="#epoptes.daemon.commands.ClientCommand.reverseErrors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="epoptes.daemon.commands.ClientConnected">
+<em class="property">class </em><code class="descclassname">epoptes.daemon.commands.</code><code class="descname">ClientConnected</code><span class="sig-paren">(</span><em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/commands.html#ClientConnected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.commands.ClientConnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.protocols.amp.Command</span></code></p>
+<p>Command for guiplex.py-&gt;GUI.client_connected
+to remotely call uiconnection.py-&gt;Daemon.client_connected.</p>
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.ClientConnected.allErrors">
+<code class="descname">allErrors</code><em class="property"> = {}</em><a class="headerlink" href="#epoptes.daemon.commands.ClientConnected.allErrors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.ClientConnected.arguments">
+<code class="descname">arguments</code><em class="property"> = [(b'handle', &lt;twisted.protocols.amp.Unicode object&gt;)]</em><a class="headerlink" href="#epoptes.daemon.commands.ClientConnected.arguments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.ClientConnected.commandName">
+<code class="descname">commandName</code><em class="property"> = b'ClientConnected'</em><a class="headerlink" href="#epoptes.daemon.commands.ClientConnected.commandName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.ClientConnected.response">
+<code class="descname">response</code><em class="property"> = []</em><a class="headerlink" href="#epoptes.daemon.commands.ClientConnected.response" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.ClientConnected.reverseErrors">
+<code class="descname">reverseErrors</code><em class="property"> = {}</em><a class="headerlink" href="#epoptes.daemon.commands.ClientConnected.reverseErrors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="epoptes.daemon.commands.ClientDisconnected">
+<em class="property">class </em><code class="descclassname">epoptes.daemon.commands.</code><code class="descname">ClientDisconnected</code><span class="sig-paren">(</span><em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/commands.html#ClientDisconnected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.commands.ClientDisconnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.protocols.amp.Command</span></code></p>
+<p>Command for guiplex.py-&gt;GUI.client_disconnected
+to remotely call uiconnection.py-&gt;Daemon.client_disconnected.</p>
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.ClientDisconnected.allErrors">
+<code class="descname">allErrors</code><em class="property"> = {}</em><a class="headerlink" href="#epoptes.daemon.commands.ClientDisconnected.allErrors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.ClientDisconnected.arguments">
+<code class="descname">arguments</code><em class="property"> = [(b'handle', &lt;twisted.protocols.amp.Unicode object&gt;)]</em><a class="headerlink" href="#epoptes.daemon.commands.ClientDisconnected.arguments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.ClientDisconnected.commandName">
+<code class="descname">commandName</code><em class="property"> = b'ClientDisconnected'</em><a class="headerlink" href="#epoptes.daemon.commands.ClientDisconnected.commandName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.ClientDisconnected.response">
+<code class="descname">response</code><em class="property"> = []</em><a class="headerlink" href="#epoptes.daemon.commands.ClientDisconnected.response" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.ClientDisconnected.reverseErrors">
+<code class="descname">reverseErrors</code><em class="property"> = {}</em><a class="headerlink" href="#epoptes.daemon.commands.ClientDisconnected.reverseErrors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="epoptes.daemon.commands.EnumerateClients">
+<em class="property">class </em><code class="descclassname">epoptes.daemon.commands.</code><code class="descname">EnumerateClients</code><span class="sig-paren">(</span><em>**kw</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/commands.html#EnumerateClients"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.commands.EnumerateClients" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.protocols.amp.Command</span></code></p>
+<p>Command for uiconnection.py-&gt;Daemon.enumerate_clients
+to remotely call guiplex.py-&gt;GUI.enumerate_clients.</p>
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.EnumerateClients.allErrors">
+<code class="descname">allErrors</code><em class="property"> = {}</em><a class="headerlink" href="#epoptes.daemon.commands.EnumerateClients.allErrors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.EnumerateClients.arguments">
+<code class="descname">arguments</code><em class="property"> = []</em><a class="headerlink" href="#epoptes.daemon.commands.EnumerateClients.arguments" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.EnumerateClients.commandName">
+<code class="descname">commandName</code><em class="property"> = b'EnumerateClients'</em><a class="headerlink" href="#epoptes.daemon.commands.EnumerateClients.commandName" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.EnumerateClients.response">
+<code class="descname">response</code><em class="property"> = [(b'handles', &lt;twisted.protocols.amp.ListOf object&gt;)]</em><a class="headerlink" href="#epoptes.daemon.commands.EnumerateClients.response" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.daemon.commands.EnumerateClients.reverseErrors">
+<code class="descname">reverseErrors</code><em class="property"> = {}</em><a class="headerlink" href="#epoptes.daemon.commands.EnumerateClients.reverseErrors" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-epoptes.daemon.exchange">
+<span id="epoptes-daemon-exchange-module"></span><h2><em>epoptes.daemon.exchange module</em><a class="headerlink" href="#module-epoptes.daemon.exchange" title="Permalink to this headline">¶</a></h2>
+<p>Variables and functions to keep track of known clients and GUIs.</p>
+<dl class="function">
+<dt id="epoptes.daemon.exchange.client_connected">
+<code class="descclassname">epoptes.daemon.exchange.</code><code class="descname">client_connected</code><span class="sig-paren">(</span><em>handle</em>, <em>client</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/exchange.html#client_connected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.exchange.client_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called from bashplex.py-&gt;connectionMade.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="epoptes.daemon.exchange.client_disconnected">
+<code class="descclassname">epoptes.daemon.exchange.</code><code class="descname">client_disconnected</code><span class="sig-paren">(</span><em>handle</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/exchange.html#client_disconnected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.exchange.client_disconnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called from bashplex.py-&gt;connectionLost.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="epoptes.daemon.exchange.client_reconnected">
+<code class="descclassname">epoptes.daemon.exchange.</code><code class="descname">client_reconnected</code><span class="sig-paren">(</span><em>handle</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/exchange.html#client_reconnected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.exchange.client_reconnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called from bashplex.py-&gt;ping_response.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="epoptes.daemon.exchange.client_timed_out">
+<code class="descclassname">epoptes.daemon.exchange.</code><code class="descname">client_timed_out</code><span class="sig-paren">(</span><em>handle</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/exchange.html#client_timed_out"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.exchange.client_timed_out" title="Permalink to this definition">¶</a></dt>
+<dd><p>Called from bashplex.py-&gt;ping_timed_out.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-epoptes.daemon.guiplex">
+<span id="epoptes-daemon-guiplex-module"></span><h2><em>epoptes.daemon.guiplex module</em><a class="headerlink" href="#module-epoptes.daemon.guiplex" title="Permalink to this headline">¶</a></h2>
+<p>Protocol for epoptesd.py &lt;=&gt; uiconnection.py communication.</p>
+<dl class="class">
+<dt id="epoptes.daemon.guiplex.GUI">
+<em class="property">class </em><code class="descclassname">epoptes.daemon.guiplex.</code><code class="descname">GUI</code><span class="sig-paren">(</span><em>boxReceiver=None</em>, <em>locator=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/guiplex.html#GUI"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.guiplex.GUI" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.protocols.amp.AMP</span></code></p>
+<p>Protocol for epoptesd.py &lt;=&gt; uiconnection.py communication.</p>
+<dl class="method">
+<dt id="epoptes.daemon.guiplex.GUI.client_command">
+<code class="descname">client_command</code><span class="sig-paren">(</span><em>handle</em>, <em>command</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/guiplex.html#GUI.client_command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.guiplex.GUI.client_command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remotely called from uiconnection.py-&gt;Daemon.command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.guiplex.GUI.client_connected">
+<code class="descname">client_connected</code><span class="sig-paren">(</span><em>handle</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/guiplex.html#GUI.client_connected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.guiplex.GUI.client_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remotely call uiconnection.py-&gt;Daemon.client_connected.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.guiplex.GUI.client_disconnected">
+<code class="descname">client_disconnected</code><span class="sig-paren">(</span><em>handle</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/guiplex.html#GUI.client_disconnected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.guiplex.GUI.client_disconnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remotely call uiconnection.py-&gt;Daemon.client_connected.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.guiplex.GUI.connectionLost">
+<code class="descname">connectionLost</code><span class="sig-paren">(</span><em>reason</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/guiplex.html#GUI.connectionLost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.guiplex.GUI.connectionLost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override AMP.connectionLost.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.guiplex.GUI.connectionMade">
+<code class="descname">connectionMade</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/guiplex.html#GUI.connectionMade"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.guiplex.GUI.connectionMade" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override BaseProtocol.connectionMade.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.guiplex.GUI.enumerate_clients">
+<code class="descname">enumerate_clients</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/guiplex.html#GUI.enumerate_clients"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.guiplex.GUI.enumerate_clients" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remotely called from uiconnection.py-&gt;Daemon.enumerate_clients.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="epoptes.daemon.guiplex.GUIFactory">
+<em class="property">class </em><code class="descclassname">epoptes.daemon.guiplex.</code><code class="descname">GUIFactory</code><a class="reference internal" href="../_modules/epoptes/daemon/guiplex.html#GUIFactory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.guiplex.GUIFactory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.internet.protocol.ServerFactory</span></code></p>
+<p>The factory for the GUI protocol.</p>
+<dl class="attribute">
+<dt id="epoptes.daemon.guiplex.GUIFactory.protocol">
+<code class="descname">protocol</code><a class="headerlink" href="#epoptes.daemon.guiplex.GUIFactory.protocol" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="#epoptes.daemon.guiplex.GUI" title="epoptes.daemon.guiplex.GUI"><code class="xref py py-class docutils literal notranslate"><span class="pre">GUI</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-epoptes.daemon.uiconnection">
+<span id="epoptes-daemon-uiconnection-module"></span><h2><em>epoptes.daemon.uiconnection module</em><a class="headerlink" href="#module-epoptes.daemon.uiconnection" title="Permalink to this headline">¶</a></h2>
+<p>GUI-side part of the gui.py &lt;=UNIX=&gt; guiplex.py protocol.</p>
+<dl class="class">
+<dt id="epoptes.daemon.uiconnection.Daemon">
+<em class="property">class </em><code class="descclassname">epoptes.daemon.uiconnection.</code><code class="descname">Daemon</code><span class="sig-paren">(</span><em>client</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/uiconnection.html#Daemon"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.uiconnection.Daemon" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">twisted.protocols.amp.AMP</span></code></p>
+<p>GUI-side part of the gui.py &lt;=UNIX=&gt; guiplex.py protocol.</p>
+<dl class="method">
+<dt id="epoptes.daemon.uiconnection.Daemon.client_connected">
+<code class="descname">client_connected</code><span class="sig-paren">(</span><em>handle</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/uiconnection.html#Daemon.client_connected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.uiconnection.Daemon.client_connected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remotely called from guiplex.py-&gt;GUI.client_connected.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.uiconnection.Daemon.client_disconnected">
+<code class="descname">client_disconnected</code><span class="sig-paren">(</span><em>handle</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/uiconnection.html#Daemon.client_disconnected"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.uiconnection.Daemon.client_disconnected" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remotely called from guiplex.py-&gt;GUI.client_disconnected.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.uiconnection.Daemon.command">
+<code class="descname">command</code><span class="sig-paren">(</span><em>handle</em>, <em>command</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/uiconnection.html#Daemon.command"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.uiconnection.Daemon.command" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remotely call guiplex.py-&gt;GUI.command.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.uiconnection.Daemon.connectionLost">
+<code class="descname">connectionLost</code><span class="sig-paren">(</span><em>reason</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/uiconnection.html#Daemon.connectionLost"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.uiconnection.Daemon.connectionLost" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override AMP.connectionLost.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.uiconnection.Daemon.connectionMade">
+<code class="descname">connectionMade</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/uiconnection.html#Daemon.connectionMade"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.uiconnection.Daemon.connectionMade" title="Permalink to this definition">¶</a></dt>
+<dd><p>Override BaseProtocol.connectionMade.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.daemon.uiconnection.Daemon.enumerate_clients">
+<code class="descname">enumerate_clients</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/epoptes/daemon/uiconnection.html#Daemon.enumerate_clients"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.daemon.uiconnection.Daemon.enumerate_clients" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remotely call guiplex.py-&gt;GUI.enumerate_clients.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-epoptes.daemon">
+<span id="module-contents"></span><h2><em>Module contents</em><a class="headerlink" href="#module-epoptes.daemon" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#"><strong>epoptes.daemon package</strong></a><ul>
+<li><a class="reference internal" href="#submodules"><em>Submodules</em></a></li>
+<li><a class="reference internal" href="#module-epoptes.daemon.bashplex"><em>epoptes.daemon.bashplex module</em></a></li>
+<li><a class="reference internal" href="#module-epoptes.daemon.commands"><em>epoptes.daemon.commands module</em></a></li>
+<li><a class="reference internal" href="#module-epoptes.daemon.exchange"><em>epoptes.daemon.exchange module</em></a></li>
+<li><a class="reference internal" href="#module-epoptes.daemon.guiplex"><em>epoptes.daemon.guiplex module</em></a></li>
+<li><a class="reference internal" href="#module-epoptes.daemon.uiconnection"><em>epoptes.daemon.uiconnection module</em></a></li>
+<li><a class="reference internal" href="#module-epoptes.daemon"><em>Module contents</em></a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="epoptes.core.html"
+                        title="previous chapter"><strong>epoptes.core package</strong></a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="epoptes.ui.html"
+                        title="next chapter"><strong>epoptes.ui package</strong></a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/rst/epoptes.daemon.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="epoptes.ui.html" title="epoptes.ui package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="epoptes.core.html" title="epoptes.core package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="index.html" ><strong>Epoptes</strong></a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="epoptes.html" ><strong>epoptes package</strong></a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Giouli Tsami.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.
+    </div>
+  </body>
+</html>

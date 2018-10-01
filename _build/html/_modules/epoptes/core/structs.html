@@ -1,0 +1,171 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>epoptes.core.structs &#8212; Epoptes 2018 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for epoptes.core.structs</h1><div class="highlight"><pre>
+<span></span><span class="c1"># This file is part of Epoptes, http://epoptes.org</span>
+<span class="c1"># Copyright 2010-2018 the Epoptes team, see AUTHORS.</span>
+<span class="c1"># SPDX-License-Identifier: GPL-3.0-or-later</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Classes for creating client and group objects.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">clients</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<div class="viewcode-block" id="Client"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.structs.Client">[docs]</a><span class="k">class</span> <span class="nc">Client</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;An epoptes client.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">mac</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">hostname</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">users</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">hsystem</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">type_</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mac</span> <span class="o">=</span> <span class="n">mac</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="n">hostname</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alias</span> <span class="o">=</span> <span class="n">alias</span>
+        <span class="k">if</span> <span class="n">users</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">users</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">users</span> <span class="o">=</span> <span class="n">users</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hsystem</span> <span class="o">=</span> <span class="n">hsystem</span>
+        <span class="n">clients</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Client.set_offline"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.structs.Client.set_offline">[docs]</a>    <span class="k">def</span> <span class="nf">set_offline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Indicate that a client is now offline.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hsystem</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">users</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="s1">&#39;offline&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span></div>
+
+<div class="viewcode-block" id="Client.is_offline"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.structs.Client.is_offline">[docs]</a>    <span class="k">def</span> <span class="nf">is_offline</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return True only if there is no system or session handle for this</span>
+<span class="sd">        client but there is a MAC address.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">users</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">hsystem</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">mac</span></div>
+
+<div class="viewcode-block" id="Client.get_name"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.structs.Client.get_name">[docs]</a>    <span class="k">def</span> <span class="nf">get_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the alias of the client or the hostname if the alias is not</span>
+<span class="sd">        set, or if both are unset (offline clients) return the MAC address.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">alias</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">hostname</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">mac</span></div>
+
+<div class="viewcode-block" id="Client.set_name"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.structs.Client.set_name">[docs]</a>    <span class="k">def</span> <span class="nf">set_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set the client alias.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alias</span> <span class="o">=</span> <span class="n">name</span></div>
+
+<div class="viewcode-block" id="Client.add_user"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.structs.Client.add_user">[docs]</a>    <span class="k">def</span> <span class="nf">add_user</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="p">,</span> <span class="n">realname</span><span class="p">,</span> <span class="n">handle</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a user in the users dict.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">[</span><span class="n">handle</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;uname&#39;</span><span class="p">:</span> <span class="n">username</span><span class="p">,</span> <span class="s1">&#39;rname&#39;</span><span class="p">:</span> <span class="n">realname</span><span class="p">}</span></div></div>
+
+
+<div class="viewcode-block" id="Group"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.structs.Group">[docs]</a><span class="k">class</span> <span class="nc">Group</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A group of epoptes clients.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">members</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="c1"># {&lt;instance&gt; : {&#39;x_pos&#39;:342, &#39;y_pos&#39;:112, &#39;size&#39;:600}}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">members</span> <span class="o">=</span> <span class="n">members</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Group.get_members"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.structs.Group.get_members">[docs]</a>    <span class="k">def</span> <span class="nf">get_members</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a list with all the clients that are members of the group.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Group.has_client"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.structs.Group.has_client">[docs]</a>    <span class="k">def</span> <span class="nf">has_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Check if a client is member of the group.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">client</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span></div>
+
+<div class="viewcode-block" id="Group.add_client"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.structs.Group.add_client">[docs]</a>    <span class="k">def</span> <span class="nf">add_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="o">**</span><span class="n">props</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a client to the group.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">[</span><span class="n">client</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_properties</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="o">**</span><span class="n">props</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Group.remove_client"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.structs.Group.remove_client">[docs]</a>    <span class="k">def</span> <span class="nf">remove_client</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove a client from the group.&quot;&quot;&quot;</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">[</span><span class="n">client</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Group.set_properties"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.structs.Group.set_properties">[docs]</a>    <span class="k">def</span> <span class="nf">set_properties</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="o">**</span><span class="n">props</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Set x_pos, y_pos or size property for a client on the group.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">prop</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">props</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">[</span><span class="n">client</span><span class="p">][</span><span class="n">prop</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+                <span class="c1"># TODO: Save the new values to the disk.</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The value of &#39;</span><span class="si">%s</span><span class="s2">&#39; must be a number.&quot;</span> <span class="o">%</span> <span class="n">prop</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Group.get_property"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.structs.Group.get_property">[docs]</a>    <span class="k">def</span> <span class="nf">get_property</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">,</span> <span class="n">prop</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return the value of the &#39;prop&#39; property for client.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">[</span><span class="n">client</span><span class="p">][</span><span class="n">prop</span><span class="p">]</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Giouli Tsami.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.
+    </div>
+  </body>
+</html>

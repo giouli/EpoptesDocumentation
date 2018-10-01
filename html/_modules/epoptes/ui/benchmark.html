@@ -1,0 +1,345 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>epoptes.ui.benchmark &#8212; Epoptes 2018 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for epoptes.ui.benchmark</h1><div class="highlight"><pre>
+<span></span><span class="c1"># This file is part of Epoptes, http://epoptes.org</span>
+<span class="c1"># Copyright 2016-2018 the Epoptes team, see AUTHORS.</span>
+<span class="c1"># SPDX-License-Identifier: GPL-3.0-or-later</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Network benchmark.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># TODO: either switch to iperf3, or reimplement it with python/twisted.</span>
+<span class="c1"># iperf2 doesn&#39;t work behind NAT and has several issues, for example:</span>
+<span class="c1"># https://sourceforge.net/p/iperf2/discussion/general/thread/db0fed22/</span>
+<span class="kn">from</span> <span class="nn">epoptes.common.constants</span> <span class="k">import</span> <span class="n">C_INSTANCE</span>
+<span class="kn">from</span> <span class="nn">epoptes.core</span> <span class="k">import</span> <span class="n">spawn_process</span>
+<span class="kn">from</span> <span class="nn">epoptes.ui.common</span> <span class="k">import</span> <span class="n">gettext</span> <span class="k">as</span> <span class="n">_</span><span class="p">,</span> <span class="n">locate_resource</span>
+<span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">GLib</span><span class="p">,</span> <span class="n">Gtk</span>
+
+
+<div class="viewcode-block" id="humanize"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.benchmark.humanize">[docs]</a><span class="k">def</span> <span class="nf">humanize</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">decimal</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert bits to [KMGTPEZ]bits.&quot;&quot;&quot;</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">prefix</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;K&#39;</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">,</span> <span class="s1">&#39;G&#39;</span><span class="p">,</span> <span class="s1">&#39;T&#39;</span><span class="p">,</span> <span class="s1">&#39;P&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1000</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">decimal</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%.*f</span><span class="s2"> </span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">decimal</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">value</span> <span class="o">/</span> <span class="mi">1000</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%.*f</span><span class="s2"> </span><span class="si">%s%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">decimal</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Benchmark"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.benchmark.Benchmark">[docs]</a><span class="k">class</span> <span class="nc">Benchmark</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Network benchmark.&quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">,</span> <span class="n">execute</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clients</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">countdown_event</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">execute</span> <span class="o">=</span> <span class="n">execute</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">iperf</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span> <span class="o">=</span> <span class="n">parent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spawn_process</span> <span class="o">=</span> <span class="n">spawn_process</span><span class="o">.</span><span class="n">SpawnProcess</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">on_iperf_exit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeleft</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">builder</span> <span class="o">=</span> <span class="n">Gtk</span><span class="o">.</span><span class="n">Builder</span><span class="p">()</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">add_from_file</span><span class="p">(</span><span class="n">locate_resource</span><span class="p">(</span><span class="s1">&#39;benchmark.ui&#39;</span><span class="p">))</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">connect_signals</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_message</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;dlg_message&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_benchmark</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;dlg_benchmark&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">adj_seconds</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;adj_seconds&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_seconds</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;box_seconds&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spb_seconds</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;spb_seconds&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_countdown</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;box_countdown&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_countdown</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_countdown&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_start</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;btn_start&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_stop</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;btn_stop&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_results</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;dlg_results&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lss_results</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lss_results&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tvc_upload</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;tvc_upload&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tvc_download</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;tvc_download&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crt_upload</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;crt_upload&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">crt_download</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;crt_download&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_avg_down</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_avg_down&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_avg_up</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_avg_up&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_avg_down</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_avg_down&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_avg_up</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_avg_up&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_total_down</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_total_down&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_total_up</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;lbl_total_up&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_partial_results</span> <span class="o">=</span> <span class="n">builder</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="s1">&#39;box_partial_results&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_message</span><span class="o">.</span><span class="n">set_transient_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_benchmark</span><span class="o">.</span><span class="n">set_transient_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_results</span><span class="o">.</span><span class="n">set_transient_for</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tvc_upload</span><span class="o">.</span><span class="n">set_cell_data_func</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">crt_upload</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_func</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tvc_download</span><span class="o">.</span><span class="n">set_cell_data_func</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">crt_download</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_func</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Benchmark.warning_message"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.benchmark.Benchmark.warning_message">[docs]</a>    <span class="k">def</span> <span class="nf">warning_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Show a warning dialog.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_message</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s2">&quot;message-type&quot;</span><span class="p">,</span> <span class="n">Gtk</span><span class="o">.</span><span class="n">MessageType</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_message</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Warning&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_message</span><span class="o">.</span><span class="n">set_markup</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_message</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Benchmark.error_message"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.benchmark.Benchmark.error_message">[docs]</a>    <span class="k">def</span> <span class="nf">error_message</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Show an error dialog.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_message</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s2">&quot;message-type&quot;</span><span class="p">,</span> <span class="n">Gtk</span><span class="o">.</span><span class="n">MessageType</span><span class="o">.</span><span class="n">ERROR</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_message</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Error&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_message</span><span class="o">.</span><span class="n">set_markup</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_message</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Benchmark.on_dlg_message_close"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.benchmark.Benchmark.on_dlg_message_close">[docs]</a>    <span class="k">def</span> <span class="nf">on_dlg_message_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_widget</span><span class="p">,</span> <span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle btn_close_message.clicked and dlg_message.delete_event.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_message</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Benchmark.run"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.benchmark.Benchmark.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">clients</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Show the dialog, then hide it so that it may be reused.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">clients</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># This can happen on an empty group.</span>
+        <span class="c1"># Btw, &quot;if not clients&quot; is wrong as it&#39;s a Gtk.ListStore, not a dict.</span>
+        <span class="c1"># pylint: disable=len-as-condition</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">clients</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning_message</span><span class="p">(</span>
+                <span class="n">_</span><span class="p">(</span><span class="s1">&#39;There are no selected clients to run the benchmark on.&#39;</span><span class="p">))</span>
+            <span class="k">return</span>
+
+        <span class="c1"># Check if offline clients or clients with no root client are selected</span>
+        <span class="n">off</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">client</span> <span class="ow">in</span> <span class="n">clients</span><span class="p">:</span>
+            <span class="n">inst</span> <span class="o">=</span> <span class="n">client</span><span class="p">[</span><span class="n">C_INSTANCE</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">hsystem</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">[</span><span class="n">inst</span><span class="o">.</span><span class="n">hsystem</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span>\
+                    <span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">hsystem</span><span class="p">,</span> <span class="n">inst</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">off</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">get_name</span><span class="p">())</span>
+
+        <span class="c1"># Now self.clients is the list of clients that can run the benchmark</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning_message</span><span class="p">(</span>
+                <span class="n">_</span><span class="p">(</span><span class="s1">&#39;All of the selected clients are either offline,&#39;</span>
+                  <span class="s1">&#39; or do not have epoptes-client running as root.&#39;</span><span class="p">))</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">off</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warning_message</span><span class="p">(</span>
+                <span class="n">_</span><span class="p">(</span><span class="s1">&#39;The following clients will be excluded from the benchmark&#39;</span>
+                  <span class="s1">&#39; because they are either offline, or do not have&#39;</span>
+                  <span class="s1">&#39; epoptes-client running as root.&#39;</span><span class="p">)</span>
+                <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">off</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_seconds</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_countdown</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_start</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_stop</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_benchmark</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Benchmark.on_btn_start_clicked"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.benchmark.Benchmark.on_btn_start_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">on_btn_start_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_widget</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle btn_start.clicked event.&quot;&quot;&quot;</span>
+        <span class="n">seconds</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">adj_seconds</span><span class="o">.</span><span class="n">get_value</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spawn_process</span><span class="o">.</span><span class="n">spawn</span><span class="p">(</span><span class="s1">&#39;iperf -s -xS -yC&#39;</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span>
+                                 <span class="n">timeout</span><span class="o">=</span><span class="p">(</span><span class="n">seconds</span> <span class="o">+</span> <span class="mi">3</span><span class="p">),</span>
+                                 <span class="n">lines_max</span><span class="o">=</span><span class="mi">2</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">client</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">:</span>
+            <span class="n">handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">[</span><span class="n">client</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># Half time for upload speed and half for download</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">handle</span><span class="p">,</span> <span class="s1">&#39;start_benchmark </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">int</span><span class="p">(</span><span class="n">seconds</span><span class="o">/</span><span class="mi">2</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeleft</span> <span class="o">=</span> <span class="n">seconds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_seconds</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_countdown</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_start</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_stop</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_countdown</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s2">&quot;Benchmark finishing in </span><span class="si">%d</span><span class="s2"> seconds...&quot;</span><span class="p">)</span>
+                                    <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeleft</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">countdown_event</span> <span class="o">=</span> <span class="n">GLib</span><span class="o">.</span><span class="n">timeout_add</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">update_countdown</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Benchmark.update_countdown"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.benchmark.Benchmark.update_countdown">[docs]</a>    <span class="k">def</span> <span class="nf">update_countdown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update the countdown label.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeleft</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeleft</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lbl_countdown</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span>
+                <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Benchmark finishing in </span><span class="si">%d</span><span class="s2"> seconds...&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeleft</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lbl_countdown</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span>
+                <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Some clients didn&#39;t respond in time!&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="o">+</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Waiting for </span><span class="si">%d</span><span class="s2"> more seconds...&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timeleft</span> <span class="o">+</span> <span class="mi">3</span><span class="p">))</span>
+
+        <span class="c1"># Always recall; the timeout will be cancelled in on_iperf_exit.</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Benchmark.parse_iperf_output"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.benchmark.Benchmark.parse_iperf_output">[docs]</a>    <span class="k">def</span> <span class="nf">parse_iperf_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_data</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse &#39;output&#39; as a string of single or multiple lines of CSV in the</span>
+<span class="sd">        form of [timestamp, server_ip, port, client_ip, port, id, from-to</span>
+<span class="sd">        transfered(Bytes), bandwidth(bps)] and populate a dict of client_ip:</span>
+<span class="sd">         [upload Mbps, download Mbps] pairs storing it in self.results.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">out_data</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">9</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">client_ip</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+            <span class="n">client_port</span> <span class="o">=</span> <span class="n">values</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>  <span class="c1"># will be 5001 if the client is receiving</span>
+            <span class="n">bandwidth</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="mi">8</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">client_ip</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">client_ip</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">client_ip</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">client_port</span> <span class="o">==</span> <span class="s2">&quot;5001&quot;</span><span class="p">:</span>
+                    <span class="c1"># Download (bits/s)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">client_ip</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bandwidth</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Upload (bits/s)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">client_ip</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">bandwidth</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Benchmark.data_func"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.benchmark.Benchmark.data_func">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">data_func</span><span class="p">(</span><span class="n">_column</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">itr</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert model&#39;s glong to text, to display humanized units.&quot;&quot;&quot;</span>
+        <span class="n">bps</span> <span class="o">=</span> <span class="n">model</span><span class="p">[</span><span class="n">itr</span><span class="p">][</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">bps</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">cell</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="s2">&quot;—&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cell</span><span class="o">.</span><span class="n">set_property</span><span class="p">(</span><span class="s2">&quot;text&quot;</span><span class="p">,</span> <span class="n">humanize</span><span class="p">(</span><span class="n">bps</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;bps&#39;</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Benchmark.on_iperf_exit"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.benchmark.Benchmark.on_iperf_exit">[docs]</a>    <span class="k">def</span> <span class="nf">on_iperf_exit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_data</span><span class="p">,</span> <span class="n">err_data</span><span class="p">,</span> <span class="n">reason</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The benchmark has finished, show the results dialog.&quot;&quot;&quot;</span>
+        <span class="n">GLib</span><span class="o">.</span><span class="n">source_remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">countdown_event</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_seconds</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_countdown</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_start</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_stop</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">reason</span> <span class="o">==</span> <span class="s2">&quot;stopped&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">btn_stop</span><span class="o">.</span><span class="n">set_sensitive</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="n">reason</span> <span class="o">==</span> <span class="s2">&quot;closed&quot;</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_benchmark</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parse_iperf_output</span><span class="p">(</span><span class="n">out_data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">_</span><span class="p">(</span><span class="s2">&quot;Did not get measurements from any of the clients.&quot;</span>
+                    <span class="s2">&quot; Check your network settings.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">err_data</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">err_data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">error_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># At this point we do have some results, so show dlg_results</span>
+        <span class="n">total_up</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">total_down</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lss_results</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+        <span class="c1"># List all the clients regardless of if we received measurements</span>
+        <span class="k">for</span> <span class="n">client_ip</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">:</span>
+            <span class="n">client_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">[</span><span class="n">client_ip</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">client_ip</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">:</span>
+                <span class="n">upload</span><span class="p">,</span> <span class="n">download</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">results</span><span class="p">[</span><span class="n">client_ip</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">upload</span><span class="p">,</span> <span class="n">download</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lss_results</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">client_name</span><span class="p">,</span> <span class="n">upload</span><span class="p">,</span> <span class="n">download</span><span class="p">])</span>
+            <span class="n">total_up</span> <span class="o">+=</span> <span class="n">upload</span>
+            <span class="n">total_down</span> <span class="o">+=</span> <span class="n">download</span>
+
+        <span class="n">clients_n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_avg_up</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span>
+            <span class="n">humanize</span><span class="p">(</span><span class="n">total_up</span> <span class="o">/</span> <span class="n">clients_n</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;bps&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_total_up</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">humanize</span><span class="p">(</span><span class="n">total_up</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;bps&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_avg_down</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span>
+            <span class="n">humanize</span><span class="p">(</span><span class="n">total_down</span> <span class="o">/</span> <span class="n">clients_n</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;bps&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lbl_total_down</span><span class="o">.</span><span class="n">set_text</span><span class="p">(</span><span class="n">humanize</span><span class="p">(</span><span class="n">total_down</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s1">&#39;bps&#39;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_partial_results</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spawn_process</span><span class="o">.</span><span class="n">lines_count</span> <span class="o">!=</span> <span class="mi">2</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clients</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_results</span><span class="o">.</span><span class="n">run</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Benchmark.on_btn_stop_clicked"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.benchmark.Benchmark.on_btn_stop_clicked">[docs]</a>    <span class="k">def</span> <span class="nf">on_btn_stop_clicked</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_widget</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle btn_stop.clicked event.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">btn_stop</span><span class="o">.</span><span class="n">set_sensitive</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spawn_process</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="s1">&#39;stopped&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Benchmark.on_dlg_benchmark_close"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.benchmark.Benchmark.on_dlg_benchmark_close">[docs]</a>    <span class="k">def</span> <span class="nf">on_dlg_benchmark_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_widget</span><span class="p">,</span> <span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle btn_close_benchmark.clicked, dlg_benchmark.delete_event.&quot;&quot;&quot;</span>
+        <span class="c1"># For simplicity, we assume that the user isn&#39;t fast enough</span>
+        <span class="c1"># to close the dialog and reopen it before on_exit is called.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">spawn_process</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s2">&quot;running&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spawn_process</span><span class="o">.</span><span class="n">stop</span><span class="p">(</span><span class="s1">&#39;stopped&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_benchmark</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Benchmark.on_dlg_results_close"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.benchmark.Benchmark.on_dlg_results_close">[docs]</a>    <span class="k">def</span> <span class="nf">on_dlg_results_close</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">_widget</span><span class="p">,</span> <span class="n">_event</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Handle btn_close_results.clicked and dlg_results.delete_event.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dlg_results</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Giouli Tsami.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.
+    </div>
+  </body>
+</html>

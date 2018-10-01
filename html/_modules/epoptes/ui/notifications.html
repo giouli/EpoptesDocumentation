@@ -1,0 +1,250 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>epoptes.ui.notifications &#8212; Epoptes 2018 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for epoptes.ui.notifications</h1><div class="highlight"><pre>
+<span></span><span class="c1"># This file is part of Epoptes, http://epoptes.org</span>
+<span class="c1"># Copyright 2015-2018 the Epoptes team, see AUTHORS.</span>
+<span class="c1"># SPDX-License-Identifier: GPL-3.0-or-later</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Notifications.</span>
+<span class="sd">Keep at most 10 lines of headings and messages.</span>
+<span class="sd">A new bubble is created after 10 secs of inactivity.</span>
+<span class="sd">That means that the oldest event may show for up to 9*10 seconds or so.</span>
+
+<span class="sd">Example bubble layout:</span>
+<span class="sd">[icon] Epoptes</span>
+<span class="sd">*Connected:*</span>
+<span class="sd">  user1 on host1</span>
+<span class="sd">  user2 on host2</span>
+<span class="sd">*Disconnected:*</span>
+<span class="sd">  user3 from host3</span>
+<span class="sd">*Shut down:*</span>
+<span class="sd">  host4</span>
+<span class="sd">*Connected:*</span>
+<span class="sd">  user5 on host5</span>
+
+<span class="sd">Notes for current server implementations (get_server_info, get_server_caps):</span>
+<span class="sd">* bionic-ubuntu: no multiple bubbles,</span>
+<span class="sd">    shows up to only 6 lines when hovered, merges &#39;\n&#39; otherwise,</span>
+<span class="sd">    keeps history in the clock (one entry for all updates)</span>
+<span class="sd">  (True, ret_name=&#39;gnome-shell&#39;, ret_vendor=&#39;GNOME&#39;,</span>
+<span class="sd">    ret_version=&#39;3.28.1&#39;, ret_spec_version=&#39;1.2&#39;)</span>
+<span class="sd">  [&#39;actions&#39;, &#39;body&#39;, &#39;body-markup&#39;, &#39;icon-static&#39;, &#39;persistence&#39;, &#39;sound&#39;]</span>
+<span class="sd">* bionic-mate: supports multiple bubbles</span>
+<span class="sd">  (True, ret_name=&#39;Notification Daemon&#39;, ret_vendor=&#39;MATE&#39;,</span>
+<span class="sd">    ret_version=&#39;1.20.0&#39;, ret_spec_version=&#39;1.1&#39;)</span>
+<span class="sd">  [&#39;actions&#39;, &#39;action-icons&#39;, &#39;body&#39;, &#39;body-hyperlinks&#39;, &#39;body-markup&#39;,</span>
+<span class="sd">    &#39;icon-static&#39;, &#39;sound&#39;]</span>
+<span class="sd">* bionic-kubuntu: shows scrollbar after 10 messages,</span>
+<span class="sd">    keeps history in the notification area (one entry per update!)</span>
+<span class="sd">  (True, ret_name=&#39;Plasma&#39;, ret_vendor=&#39;KDE&#39;,</span>
+<span class="sd">    ret_version=&#39;2.0&#39;, ret_spec_version=&#39;1.1&#39;)</span>
+<span class="sd">  [&#39;actions&#39;, &#39;body&#39;, &#39;body-hyperlinks&#39;, &#39;body-markup&#39;, &#39;icon-static&#39;]</span>
+<span class="sd">* bionic-lubuntu (xfce4-notifyd): same as bionic-xubuntu</span>
+<span class="sd">* bionic-xubuntu (xfce4-notifyd): closes on click (no [x] button)</span>
+<span class="sd">  (True, ret_name=&#39;Xfce Notify Daemon&#39;, ret_vendor=&#39;Xfce&#39;,</span>
+<span class="sd">    ret_version=&#39;0.4.2&#39;, ret_spec_version=&#39;1.2&#39;)</span>
+<span class="sd">  [&#39;actions&#39;, &#39;body&#39;, &#39;body-hyperlinks&#39;, &#39;body-markup&#39;, &#39;icon-static&#39;,</span>
+<span class="sd">    &#39;x-canonical-private-icon-only&#39;]</span>
+<span class="sd">* stretch-gnome: same as bionic-ubuntu</span>
+<span class="sd">* stretch-gnome (with notification-daemon -r): no multiple bubbles</span>
+<span class="sd">  (True, ret_name=&#39;Notification Daemon&#39;, ret_vendor=&#39;GNOME&#39;,</span>
+<span class="sd">    ret_version=&#39;3.20.0&#39;, ret_spec_version=&#39;1.2&#39;)</span>
+<span class="sd">  [&#39;actions&#39;, &#39;action-icons&#39;, &#39;body&#39;, &#39;body-hyperlinks&#39;, &#39;body-markup&#39;,</span>
+<span class="sd">    &#39;icon-static&#39;, &#39;persistence&#39;, &#39;sound&#39;]</span>
+<span class="sd">* sylvia-cinnamon:</span>
+<span class="sd">  (True, ret_name=&#39;cinnamon&#39;, ret_vendor=&#39;GNOME&#39;,</span>
+<span class="sd">    ret_version=&#39;3.6.7&#39;, ret_spec_version=&#39;1.2&#39;)</span>
+<span class="sd">  [&#39;actions&#39;, &#39;action-icons&#39;, &#39;body&#39;, &#39;body-markup&#39;, &#39;icon-static&#39;,</span>
+<span class="sd">    &#39;persistence&#39;]</span>
+<span class="sd">* xenial-ubuntu:</span>
+<span class="sd">  (True, ret_name=&#39;notify-osd&#39;, ret_vendor=&#39;Canonical Ltd&#39;,</span>
+<span class="sd">    ret_version=&#39;1.0&#39;, ret_spec_version=&#39;1.1&#39;)</span>
+<span class="sd">  [&#39;body&#39;, &#39;body-markup&#39;, &#39;icon-static&#39;, &#39;image/svg+xml&#39;,</span>
+<span class="sd">    &#39;x-canonical-private-synchronous&#39;, &#39;x-canonical-append&#39;,</span>
+<span class="sd">    &#39;x-canonical-private-icon-only&#39;, &#39;x-canonical-truncation&#39;,</span>
+<span class="sd">    &#39;private-synrchronous&#39;, &#39;append&#39;, &#39;private-icon-only&#39;, &#39;truncation&#39;]</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="kn">from</span> <span class="nn">epoptes.ui.common</span> <span class="k">import</span> <span class="n">gettext</span> <span class="k">as</span> <span class="n">_</span>
+<span class="kn">from</span> <span class="nn">gi.repository</span> <span class="k">import</span> <span class="n">Notify</span>
+
+
+<div class="viewcode-block" id="NotifyQueue"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.notifications.NotifyQueue">[docs]</a><span class="k">class</span> <span class="nc">NotifyQueue</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;A special queue that keeps at most 10 lines of headings and messages.&quot;&quot;&quot;</span>
+    <span class="n">initialized</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">summary</span><span class="p">,</span> <span class="n">icon</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Initialize Notify and local variables.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">NotifyQueue</span><span class="o">.</span><span class="n">initialized</span><span class="p">:</span>
+            <span class="n">NotifyQueue</span><span class="o">.</span><span class="n">initialized</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">Notify</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="s2">&quot;Epoptes&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span><span class="n">_</span><span class="p">(</span><span class="s1">&#39;Could not initialize notifications!&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">summary</span> <span class="o">=</span> <span class="n">summary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">icon</span> <span class="o">=</span> <span class="n">icon</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># The heading of the last item enqueued</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_heading</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notification</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="NotifyQueue.enqueue"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.notifications.NotifyQueue.enqueue">[docs]</a>    <span class="k">def</span> <span class="nf">enqueue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">heading</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Add a new message to the queue, and show it.&quot;&quot;&quot;</span>
+        <span class="c1"># Create a new bubble if 10 secs have passed from the last notification</span>
+        <span class="n">now</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">now</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_time</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">icon</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_time</span> <span class="o">=</span> <span class="n">now</span>
+        <span class="k">if</span> <span class="n">heading</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">last_heading</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_heading</span> <span class="o">=</span> <span class="n">heading</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&lt;b&gt;</span><span class="si">{}</span><span class="s2">&lt;/b&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">heading</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;  </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
+        <span class="c1"># One enqueue may insert both heading and msg, needing 2 dequeues</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dequeue</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="NotifyQueue.dequeue"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.notifications.NotifyQueue.dequeue">[docs]</a>    <span class="k">def</span> <span class="nf">dequeue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Delete the first message after the first heading.</span>
+<span class="sd">        If the section is now empty, delete the first heading as well.&quot;&quot;&quot;</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">if</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">)</span> \
+                <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&lt;b&gt;&#39;</span><span class="p">)):</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="NotifyQueue.to_string"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.notifications.NotifyQueue.to_string">[docs]</a>    <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a string of all queued messages.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NotifyQueue.new_notification"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.notifications.NotifyQueue.new_notification">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">new_notification</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">icon</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a new notification object. Called by show().&quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">Notify</span><span class="o">.</span><span class="n">Notification</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="n">summary</span><span class="p">,</span> <span class="n">body</span><span class="p">,</span> <span class="n">icon</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">set_urgency</span><span class="p">(</span><span class="n">Notify</span><span class="o">.</span><span class="n">Urgency</span><span class="o">.</span><span class="n">LOW</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">set_hint_string</span><span class="p">(</span><span class="s1">&#39;desktop-entry&#39;</span><span class="p">,</span> <span class="s1">&#39;epoptes&#39;</span><span class="p">)</span>
+        <span class="c1"># This tells GNOME not to log the notification</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">set_hint_string</span><span class="p">(</span><span class="s1">&#39;transient&#39;</span><span class="p">,</span> <span class="s1">&#39;true&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="NotifyQueue.show"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.notifications.NotifyQueue.show">[docs]</a>    <span class="k">def</span> <span class="nf">show</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create, update, or re-create the notification, and show it.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notification</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_notification</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">icon</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">notification</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">icon</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">notification</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new_notification</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">summary</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_string</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">icon</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">notification</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../epoptes.ui.html#epoptes.ui.notifications.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Run a notifications test from the command line.</span>
+<span class="sd">    If epoptes isn&#39;t installed, `import epoptes.ui.common` must be removed.&quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;get_server_info =&quot;</span><span class="p">,</span> <span class="n">Notify</span><span class="o">.</span><span class="n">get_server_info</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;get_server_caps =&quot;</span><span class="p">,</span> <span class="n">Notify</span><span class="o">.</span><span class="n">get_server_caps</span><span class="p">())</span>
+    <span class="n">events</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;Connected:&quot;</span><span class="p">,</span> <span class="s2">&quot;user1 on host1&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Connected:&quot;</span><span class="p">,</span> <span class="s2">&quot;user2 on host2&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Disconnected:&quot;</span><span class="p">,</span> <span class="s2">&quot;user3 from host3&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Shut down:&quot;</span><span class="p">,</span> <span class="s2">&quot;host4&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Connected:&quot;</span><span class="p">,</span> <span class="s2">&quot;user5 on host5&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Connected:&quot;</span><span class="p">,</span> <span class="s2">&quot;user6 on host6&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Shut down:&quot;</span><span class="p">,</span> <span class="s2">&quot;host7&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Shut down:&quot;</span><span class="p">,</span> <span class="s2">&quot;host8&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Connected:&quot;</span><span class="p">,</span> <span class="s2">&quot;user9 on host9&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;Connected:&quot;</span><span class="p">,</span> <span class="s2">&quot;user10 on host10&quot;</span><span class="p">)</span>
+    <span class="p">]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">notq</span> <span class="o">=</span> <span class="n">NotifyQueue</span><span class="p">(</span><span class="s1">&#39;Epoptes&#39;</span><span class="p">,</span> <span class="s1">&#39;dialog-information&#39;</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">events</span><span class="p">):</span>
+        <span class="n">notq</span><span class="o">.</span><span class="n">enqueue</span><span class="p">(</span><span class="n">events</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">events</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="c1"># Wait for the bubble to autoclose, then a new one should show up</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Giouli Tsami.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.
+    </div>
+  </body>
+</html>

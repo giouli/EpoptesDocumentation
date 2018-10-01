@@ -1,0 +1,508 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>epoptes.ui package &#8212; Epoptes 2018 documentation</title>
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="setup module" href="setup.html" />
+    <link rel="prev" title="epoptes.daemon package" href="epoptes.daemon.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="setup.html" title="setup module"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="epoptes.daemon.html" title="epoptes.daemon package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="epoptes.html" accesskey="U">epoptes package</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="epoptes-ui-package">
+<h1>epoptes.ui package<a class="headerlink" href="#epoptes-ui-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-epoptes.ui.about">
+<span id="epoptes-ui-about-module"></span><h2>epoptes.ui.about module<a class="headerlink" href="#module-epoptes.ui.about" title="Permalink to this headline">¶</a></h2>
+<p>About dialog.</p>
+<dl class="class">
+<dt id="epoptes.ui.about.About">
+<em class="property">class </em><code class="descclassname">epoptes.ui.about.</code><code class="descname">About</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/about.html#About"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.about.About" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Show an about dialog.</p>
+<dl class="method">
+<dt id="epoptes.ui.about.About.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/about.html#About.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.about.About.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the dialog, then hide it so that it may be reused.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-epoptes.ui.benchmark">
+<span id="epoptes-ui-benchmark-module"></span><h2>epoptes.ui.benchmark module<a class="headerlink" href="#module-epoptes.ui.benchmark" title="Permalink to this headline">¶</a></h2>
+<p>Network benchmark.</p>
+<dl class="class">
+<dt id="epoptes.ui.benchmark.Benchmark">
+<em class="property">class </em><code class="descclassname">epoptes.ui.benchmark.</code><code class="descname">Benchmark</code><span class="sig-paren">(</span><em>parent</em>, <em>execute</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/benchmark.html#Benchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.benchmark.Benchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Network benchmark.</p>
+<dl class="staticmethod">
+<dt id="epoptes.ui.benchmark.Benchmark.data_func">
+<em class="property">static </em><code class="descname">data_func</code><span class="sig-paren">(</span><em>_column</em>, <em>cell</em>, <em>model</em>, <em>itr</em>, <em>index</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/benchmark.html#Benchmark.data_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.benchmark.Benchmark.data_func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert model’s glong to text, to display humanized units.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.benchmark.Benchmark.error_message">
+<code class="descname">error_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/benchmark.html#Benchmark.error_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.benchmark.Benchmark.error_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show an error dialog.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.benchmark.Benchmark.on_btn_start_clicked">
+<code class="descname">on_btn_start_clicked</code><span class="sig-paren">(</span><em>_widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/benchmark.html#Benchmark.on_btn_start_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.benchmark.Benchmark.on_btn_start_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle btn_start.clicked event.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.benchmark.Benchmark.on_btn_stop_clicked">
+<code class="descname">on_btn_stop_clicked</code><span class="sig-paren">(</span><em>_widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/benchmark.html#Benchmark.on_btn_stop_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.benchmark.Benchmark.on_btn_stop_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle btn_stop.clicked event.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.benchmark.Benchmark.on_dlg_benchmark_close">
+<code class="descname">on_dlg_benchmark_close</code><span class="sig-paren">(</span><em>_widget</em>, <em>_event=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/benchmark.html#Benchmark.on_dlg_benchmark_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.benchmark.Benchmark.on_dlg_benchmark_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle btn_close_benchmark.clicked, dlg_benchmark.delete_event.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.benchmark.Benchmark.on_dlg_message_close">
+<code class="descname">on_dlg_message_close</code><span class="sig-paren">(</span><em>_widget</em>, <em>_event=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/benchmark.html#Benchmark.on_dlg_message_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.benchmark.Benchmark.on_dlg_message_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle btn_close_message.clicked and dlg_message.delete_event.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.benchmark.Benchmark.on_dlg_results_close">
+<code class="descname">on_dlg_results_close</code><span class="sig-paren">(</span><em>_widget</em>, <em>_event=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/benchmark.html#Benchmark.on_dlg_results_close"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.benchmark.Benchmark.on_dlg_results_close" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handle btn_close_results.clicked and dlg_results.delete_event.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.benchmark.Benchmark.on_iperf_exit">
+<code class="descname">on_iperf_exit</code><span class="sig-paren">(</span><em>out_data</em>, <em>err_data</em>, <em>reason</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/benchmark.html#Benchmark.on_iperf_exit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.benchmark.Benchmark.on_iperf_exit" title="Permalink to this definition">¶</a></dt>
+<dd><p>The benchmark has finished, show the results dialog.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.benchmark.Benchmark.parse_iperf_output">
+<code class="descname">parse_iperf_output</code><span class="sig-paren">(</span><em>out_data</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/benchmark.html#Benchmark.parse_iperf_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.benchmark.Benchmark.parse_iperf_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse ‘output’ as a string of single or multiple lines of CSV in the
+form of [timestamp, server_ip, port, client_ip, port, id, from-to
+transfered(Bytes), bandwidth(bps)] and populate a dict of client_ip:</p>
+<blockquote>
+<div>[upload Mbps, download Mbps] pairs storing it in self.results.</div></blockquote>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.benchmark.Benchmark.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>clients</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/benchmark.html#Benchmark.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.benchmark.Benchmark.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the dialog, then hide it so that it may be reused.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.benchmark.Benchmark.update_countdown">
+<code class="descname">update_countdown</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/benchmark.html#Benchmark.update_countdown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.benchmark.Benchmark.update_countdown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the countdown label.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.benchmark.Benchmark.warning_message">
+<code class="descname">warning_message</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/benchmark.html#Benchmark.warning_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.benchmark.Benchmark.warning_message" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show a warning dialog.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="epoptes.ui.benchmark.humanize">
+<code class="descclassname">epoptes.ui.benchmark.</code><code class="descname">humanize</code><span class="sig-paren">(</span><em>value</em>, <em>decimal=1</em>, <em>unit=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/benchmark.html#humanize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.benchmark.humanize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert bits to [KMGTPEZ]bits.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-epoptes.ui.client_information">
+<span id="epoptes-ui-client-information-module"></span><h2>epoptes.ui.client_information module<a class="headerlink" href="#module-epoptes.ui.client_information" title="Permalink to this headline">¶</a></h2>
+<p>Client information dialog.</p>
+<dl class="class">
+<dt id="epoptes.ui.client_information.ClientInformation">
+<em class="property">class </em><code class="descclassname">epoptes.ui.client_information.</code><code class="descname">ClientInformation</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/client_information.html#ClientInformation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.client_information.ClientInformation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Load the dialog and settings into local variables.</p>
+<dl class="staticmethod">
+<dt id="epoptes.ui.client_information.ClientInformation.cb_set_text">
+<em class="property">static </em><code class="descname">cb_set_text</code><span class="sig-paren">(</span><em>result</em>, <em>widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/client_information.html#ClientInformation.cb_set_text"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.client_information.ClientInformation.cb_set_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set a widget text to the result of a twisted call.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.client_information.ClientInformation.on_edit_alias_clicked">
+<code class="descname">on_edit_alias_clicked</code><span class="sig-paren">(</span><em>_widget</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/client_information.html#ClientInformation.on_edit_alias_clicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.client_information.ClientInformation.on_edit_alias_clicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show a dialog to edit the alias.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.client_information.ClientInformation.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>client</em>, <em>execute</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/client_information.html#ClientInformation.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.client_information.ClientInformation.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the dialog, then hide it so that it may be reused.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-epoptes.ui.common">
+<span id="epoptes-ui-common-module"></span><h2>epoptes.ui.common module<a class="headerlink" href="#module-epoptes.ui.common" title="Permalink to this headline">¶</a></h2>
+<p>Define required gi package versions in a common place, and install gettext.</p>
+<p>Rationale:
+gi requires something like:</p>
+<blockquote>
+<div>import gi
+gi.require_version(‘Gtk’, ‘3.0’)
+from gi.repository import Gtk</div></blockquote>
+<p>This conflicts with <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/#imports">https://www.python.org/dev/peps/pep-0008/#imports</a>
+and triggers pycodestyle’s “E402 module level import not at top of file”.
+The following is a bit better:</p>
+<blockquote>
+<div><p>import sys  # Import standard library modules</p>
+<p>import twisted  # Import third party modules</p>
+<p>from epoptes.ui.common import gettext as _  # Import local modules
+from gi.repository import Gtk, Gdk</p>
+</div></blockquote>
+<p>That last line “only” triggers pylint’s “wrong-import-position” once.</p>
+<dl class="function">
+<dt id="epoptes.ui.common.locate_resource">
+<code class="descclassname">epoptes.ui.common.</code><code class="descname">locate_resource</code><span class="sig-paren">(</span><em>filename</em>, <em>absolute=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/common.html#locate_resource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.common.locate_resource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Search for filename in some known paths.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-epoptes.ui.exec_command">
+<span id="epoptes-ui-exec-command-module"></span><h2>epoptes.ui.exec_command module<a class="headerlink" href="#module-epoptes.ui.exec_command" title="Permalink to this headline">¶</a></h2>
+<p>Execute command dialog.</p>
+<dl class="class">
+<dt id="epoptes.ui.exec_command.ExecCommand">
+<em class="property">class </em><code class="descclassname">epoptes.ui.exec_command.</code><code class="descname">ExecCommand</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/exec_command.html#ExecCommand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.exec_command.ExecCommand" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Load the dialog and settings into local variables.</p>
+<dl class="method">
+<dt id="epoptes.ui.exec_command.ExecCommand.on_ent_command_changed">
+<code class="descname">on_ent_command_changed</code><span class="sig-paren">(</span><em>ent_command</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/exec_command.html#ExecCommand.on_ent_command_changed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.exec_command.ExecCommand.on_ent_command_changed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Enable execute only when the command is not empty.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.exec_command.ExecCommand.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/exec_command.html#ExecCommand.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.exec_command.ExecCommand.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the dialog, then hide it so that it may be reused.
+Return the command.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="epoptes-ui-gui-module">
+<h2>epoptes.ui.gui module<a class="headerlink" href="#epoptes-ui-gui-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-epoptes.ui.notifications">
+<span id="epoptes-ui-notifications-module"></span><h2>epoptes.ui.notifications module<a class="headerlink" href="#module-epoptes.ui.notifications" title="Permalink to this headline">¶</a></h2>
+<p>Notifications.
+Keep at most 10 lines of headings and messages.
+A new bubble is created after 10 secs of inactivity.
+That means that the oldest event may show for up to 9*10 seconds or so.</p>
+<p>Example bubble layout:
+[icon] Epoptes
+<em>Connected:</em></p>
+<blockquote>
+<div>user1 on host1
+user2 on host2</div></blockquote>
+<dl class="docutils">
+<dt><em>Disconnected:</em></dt>
+<dd>user3 from host3</dd>
+<dt><em>Shut down:</em></dt>
+<dd>host4</dd>
+<dt><em>Connected:</em></dt>
+<dd>user5 on host5</dd>
+</dl>
+<p>Notes for current server implementations (get_server_info, get_server_caps):
+* bionic-ubuntu: no multiple bubbles,</p>
+<blockquote>
+<div>shows up to only 6 lines when hovered, merges ‘</div></blockquote>
+<dl class="docutils">
+<dt>‘ otherwise,</dt>
+<dd><blockquote class="first">
+<div>keeps history in the clock (one entry for all updates)</div></blockquote>
+<dl class="docutils">
+<dt>(True, ret_name=’gnome-shell’, ret_vendor=’GNOME’,</dt>
+<dd>ret_version=‘3.28.1’, ret_spec_version=‘1.2’)</dd>
+</dl>
+<p class="last">[‘actions’, ‘body’, ‘body-markup’, ‘icon-static’, ‘persistence’, ‘sound’]</p>
+</dd>
+</dl>
+<ul>
+<li><p class="first">bionic-mate: supports multiple bubbles
+(True, ret_name=’Notification Daemon’, ret_vendor=’MATE’,</p>
+<blockquote>
+<div><p>ret_version=‘1.20.0’, ret_spec_version=‘1.1’)</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>[‘actions’, ‘action-icons’, ‘body’, ‘body-hyperlinks’, ‘body-markup’,</dt>
+<dd><p class="first last">‘icon-static’, ‘sound’]</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>bionic-kubuntu: shows scrollbar after 10 messages,</dt>
+<dd><p class="first last">keeps history in the notification area (one entry per update!)</p>
+</dd>
+<dt>(True, ret_name=’Plasma’, ret_vendor=’KDE’,</dt>
+<dd><p class="first last">ret_version=‘2.0’, ret_spec_version=‘1.1’)</p>
+</dd>
+</dl>
+<p>[‘actions’, ‘body’, ‘body-hyperlinks’, ‘body-markup’, ‘icon-static’]</p>
+</li>
+<li><p class="first">bionic-lubuntu (xfce4-notifyd): same as bionic-xubuntu</p>
+</li>
+<li><p class="first">bionic-xubuntu (xfce4-notifyd): closes on click (no [x] button)
+(True, ret_name=’Xfce Notify Daemon’, ret_vendor=’Xfce’,</p>
+<blockquote>
+<div><p>ret_version=‘0.4.2’, ret_spec_version=‘1.2’)</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>[‘actions’, ‘body’, ‘body-hyperlinks’, ‘body-markup’, ‘icon-static’,</dt>
+<dd><p class="first last">‘x-canonical-private-icon-only’]</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">stretch-gnome: same as bionic-ubuntu</p>
+</li>
+<li><p class="first">stretch-gnome (with notification-daemon -r): no multiple bubbles
+(True, ret_name=’Notification Daemon’, ret_vendor=’GNOME’,</p>
+<blockquote>
+<div><p>ret_version=‘3.20.0’, ret_spec_version=‘1.2’)</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>[‘actions’, ‘action-icons’, ‘body’, ‘body-hyperlinks’, ‘body-markup’,</dt>
+<dd><p class="first last">‘icon-static’, ‘persistence’, ‘sound’]</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">sylvia-cinnamon:
+(True, ret_name=’cinnamon’, ret_vendor=’GNOME’,</p>
+<blockquote>
+<div><p>ret_version=‘3.6.7’, ret_spec_version=‘1.2’)</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>[‘actions’, ‘action-icons’, ‘body’, ‘body-markup’, ‘icon-static’,</dt>
+<dd><p class="first last">‘persistence’]</p>
+</dd>
+</dl>
+</li>
+<li><p class="first">xenial-ubuntu:
+(True, ret_name=’notify-osd’, ret_vendor=’Canonical Ltd’,</p>
+<blockquote>
+<div><p>ret_version=‘1.0’, ret_spec_version=‘1.1’)</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>[‘body’, ‘body-markup’, ‘icon-static’, ‘image/svg+xml’,</dt>
+<dd><p class="first last">‘x-canonical-private-synchronous’, ‘x-canonical-append’,
+‘x-canonical-private-icon-only’, ‘x-canonical-truncation’,
+‘private-synrchronous’, ‘append’, ‘private-icon-only’, ‘truncation’]</p>
+</dd>
+</dl>
+</li>
+</ul>
+<dl class="class">
+<dt id="epoptes.ui.notifications.NotifyQueue">
+<em class="property">class </em><code class="descclassname">epoptes.ui.notifications.</code><code class="descname">NotifyQueue</code><span class="sig-paren">(</span><em>summary</em>, <em>icon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/notifications.html#NotifyQueue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.notifications.NotifyQueue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A special queue that keeps at most 10 lines of headings and messages.</p>
+<dl class="method">
+<dt id="epoptes.ui.notifications.NotifyQueue.dequeue">
+<code class="descname">dequeue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/notifications.html#NotifyQueue.dequeue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.notifications.NotifyQueue.dequeue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete the first message after the first heading.
+If the section is now empty, delete the first heading as well.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.notifications.NotifyQueue.enqueue">
+<code class="descname">enqueue</code><span class="sig-paren">(</span><em>heading</em>, <em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/notifications.html#NotifyQueue.enqueue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.notifications.NotifyQueue.enqueue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a new message to the queue, and show it.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="epoptes.ui.notifications.NotifyQueue.initialized">
+<code class="descname">initialized</code><em class="property"> = None</em><a class="headerlink" href="#epoptes.ui.notifications.NotifyQueue.initialized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="epoptes.ui.notifications.NotifyQueue.new_notification">
+<em class="property">static </em><code class="descname">new_notification</code><span class="sig-paren">(</span><em>summary</em>, <em>body</em>, <em>icon</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/notifications.html#NotifyQueue.new_notification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.notifications.NotifyQueue.new_notification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new notification object. Called by show().</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.notifications.NotifyQueue.show">
+<code class="descname">show</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/notifications.html#NotifyQueue.show"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.notifications.NotifyQueue.show" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create, update, or re-create the notification, and show it.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="epoptes.ui.notifications.NotifyQueue.to_string">
+<code class="descname">to_string</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/notifications.html#NotifyQueue.to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.notifications.NotifyQueue.to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a string of all queued messages.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="epoptes.ui.notifications.main">
+<code class="descclassname">epoptes.ui.notifications.</code><code class="descname">main</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/notifications.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.notifications.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a notifications test from the command line.
+If epoptes isn’t installed, <cite>import epoptes.ui.common</cite> must be removed.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="epoptes-ui-reactor-module">
+<h2>epoptes.ui.reactor module<a class="headerlink" href="#epoptes-ui-reactor-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-epoptes.ui.send_message">
+<span id="epoptes-ui-send-message-module"></span><h2>epoptes.ui.send_message module<a class="headerlink" href="#module-epoptes.ui.send_message" title="Permalink to this headline">¶</a></h2>
+<p>Send message dialog.</p>
+<dl class="class">
+<dt id="epoptes.ui.send_message.SendMessage">
+<em class="property">class </em><code class="descclassname">epoptes.ui.send_message.</code><code class="descname">SendMessage</code><span class="sig-paren">(</span><em>parent</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/send_message.html#SendMessage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.send_message.SendMessage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Load the dialog and settings into local variables.</p>
+<dl class="method">
+<dt id="epoptes.ui.send_message.SendMessage.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/epoptes/ui/send_message.html#SendMessage.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#epoptes.ui.send_message.SendMessage.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the dialog, then hide it so that it may be reused.
+Return (text, title, markup).</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-epoptes.ui">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-epoptes.ui" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">epoptes.ui package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-epoptes.ui.about">epoptes.ui.about module</a></li>
+<li><a class="reference internal" href="#module-epoptes.ui.benchmark">epoptes.ui.benchmark module</a></li>
+<li><a class="reference internal" href="#module-epoptes.ui.client_information">epoptes.ui.client_information module</a></li>
+<li><a class="reference internal" href="#module-epoptes.ui.common">epoptes.ui.common module</a></li>
+<li><a class="reference internal" href="#module-epoptes.ui.exec_command">epoptes.ui.exec_command module</a></li>
+<li><a class="reference internal" href="#epoptes-ui-gui-module">epoptes.ui.gui module</a></li>
+<li><a class="reference internal" href="#module-epoptes.ui.notifications">epoptes.ui.notifications module</a></li>
+<li><a class="reference internal" href="#epoptes-ui-reactor-module">epoptes.ui.reactor module</a></li>
+<li><a class="reference internal" href="#module-epoptes.ui.send_message">epoptes.ui.send_message module</a></li>
+<li><a class="reference internal" href="#module-epoptes.ui">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="epoptes.daemon.html"
+                        title="previous chapter">epoptes.daemon package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="setup.html"
+                        title="next chapter">setup module</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/epoptes.ui.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="setup.html" title="setup module"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="epoptes.daemon.html" title="epoptes.daemon package"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="epoptes.html" >epoptes package</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Giouli Tsami.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.
+    </div>
+  </body>
+</html>

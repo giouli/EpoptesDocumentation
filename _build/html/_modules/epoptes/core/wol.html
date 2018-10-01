@@ -1,0 +1,143 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>epoptes.core.wol &#8212; Epoptes 2018 documentation</title>
+    <link rel="stylesheet" href="../../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for epoptes.core.wol</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python3</span>
+<span class="c1"># This file is part of Epoptes, http://epoptes.org</span>
+<span class="c1"># Copyright 2018 the Epoptes team, see AUTHORS.</span>
+<span class="c1"># SPDX-License-Identifier: GPL-3.0-or-later</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Power on remote computers using Wake On LAN.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">socket</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">netifaces</span>
+
+
+<div class="viewcode-block" id="get_broadcast_list"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.wol.get_broadcast_list">[docs]</a><span class="k">def</span> <span class="nf">get_broadcast_list</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Return all broadcast addresses.</span>
+<span class="sd">    E.g. WOL messages need to be sent from all NICs.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">brlist</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&lt;broadcast&gt;&#39;</span><span class="p">]</span>
+    <span class="n">ifaces</span> <span class="o">=</span> <span class="p">[</span><span class="n">iface</span> <span class="k">for</span> <span class="n">iface</span> <span class="ow">in</span> <span class="n">netifaces</span><span class="o">.</span><span class="n">interfaces</span><span class="p">()</span> <span class="k">if</span> <span class="n">iface</span> <span class="o">!=</span> <span class="s1">&#39;lo&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">ifname</span> <span class="ow">in</span> <span class="n">ifaces</span><span class="p">:</span>
+        <span class="c1"># An interface can have more than one address, even within the</span>
+        <span class="c1"># same family (AF_INET), or none, so check this case too.</span>
+        <span class="n">addresses</span> <span class="o">=</span> <span class="n">netifaces</span><span class="o">.</span><span class="n">ifaddresses</span><span class="p">(</span><span class="n">ifname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">netifaces</span><span class="o">.</span><span class="n">AF_INET</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">addresses</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">addr</span> <span class="ow">in</span> <span class="n">addresses</span><span class="p">[</span><span class="n">netifaces</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="s1">&#39;broadcast&#39;</span> <span class="ow">in</span> <span class="n">addr</span><span class="p">:</span>
+                <span class="n">brlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">addr</span><span class="p">[</span><span class="s1">&#39;broadcast&#39;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">brlist</span></div>
+
+
+<div class="viewcode-block" id="wake_on_lan"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.wol.wake_on_lan">[docs]</a><span class="k">def</span> <span class="nf">wake_on_lan</span><span class="p">(</span><span class="n">macaddress</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Power on remote computers using Wake On LAN.&quot;&quot;&quot;</span>
+    <span class="c1"># Handle MACs with or without separators.</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">macaddress</span><span class="p">)</span> <span class="o">==</span> <span class="mi">12</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">macaddress</span><span class="p">)</span> <span class="o">==</span> <span class="mi">12</span> <span class="o">+</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="n">sep</span> <span class="o">=</span> <span class="n">macaddress</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">macaddress</span> <span class="o">=</span> <span class="n">macaddress</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Incorrect MAC address format&#39;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Sending magic packet to&quot;</span><span class="p">,</span> <span class="n">macaddress</span><span class="p">)</span>
+    <span class="n">packet</span> <span class="o">=</span> <span class="nb">bytes</span><span class="o">.</span><span class="n">fromhex</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s1">&#39;FFFFFFFFFFFF&#39;</span><span class="p">,</span> <span class="n">macaddress</span> <span class="o">*</span> <span class="mi">20</span><span class="p">]))</span>
+
+    <span class="c1"># Broadcast it to the LAN.</span>
+    <span class="n">sock</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_DGRAM</span><span class="p">)</span>
+    <span class="n">sock</span><span class="o">.</span><span class="n">setsockopt</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">SOL_SOCKET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SO_BROADCAST</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">brd</span> <span class="ow">in</span> <span class="n">get_broadcast_list</span><span class="p">():</span>
+        <span class="n">sock</span><span class="o">.</span><span class="n">sendto</span><span class="p">(</span><span class="n">packet</span><span class="p">,</span> <span class="p">(</span><span class="n">brd</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../rst/epoptes.core.html#epoptes.core.wol.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Run the module from the command line.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">mac</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="n">wake_on_lan</span><span class="p">(</span><span class="n">mac</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../../index.html">Epoptes 2018 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Giouli Tsami.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.1.
+    </div>
+  </body>
+</html>
