@@ -14,7 +14,7 @@
 #
 import os
 import sys
-sys.path.append('../epoptes/')
+sys.path.append('./epoptes/')
 # sys.path.insert(0, os.path.abspath('.'))
 
 
