@@ -14,7 +14,7 @@
 #
 import os
 import sys
-sys.path.append('/home/giouli/documentation_for_epoptes/epoptes/')
+sys.path.append('../epoptes/')
 # sys.path.insert(0, os.path.abspath('.'))
 
 
