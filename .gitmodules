@@ -1,0 +1,3 @@
+[submodule "epoptes"]
+	path = epoptes
+	url = https://github.com/Epoptes/epoptes.git
