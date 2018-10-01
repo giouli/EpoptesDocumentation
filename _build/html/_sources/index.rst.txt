@@ -12,6 +12,7 @@
    :maxdepth: 2
    :caption: Contents:
    
+   /rst/Architecture
    /rst/index
 
 
